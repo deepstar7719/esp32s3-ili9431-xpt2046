@@ -1,0 +1,1 @@
+{ "type": "library", "name": "XPT2046_Touchscreen", "version": "1.4.0", "spec": { "owner": "paulstoffregen", "id": 542, "name": "XPT2046_Touchscreen", "requirements": null, "uri": null } }
