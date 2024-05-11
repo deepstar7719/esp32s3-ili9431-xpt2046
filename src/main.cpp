@@ -1,29 +1,21 @@
 #include <Arduino.h>
 #include "ui/ui.h"
 
-// #include "touch.h"
 #include "./uiport/lv_port_gfx_disp.h"
 #include "espWifiConfig.h"
-#include <Preferences.h>
+#include "nvs_data_handle.h"
 // #include "heartWeather.h"
 // #include "heartParseJson.h"
-
+// #include "touch.h"
 
 #define DIRECT_MODE
 
 const int reset_Pin = 0; // 设置重置按键引脚,用于删除WiFi信息
 const int wifi_LED = 2;  // 设置LED引脚
-wl_status_t wifi_status = WL_IDLE_STATUS;
+uint8_t wifi_status = WL_IDLE_STATUS;
 
-struct global_Parameter
-{
-  String wifi_ssid = "";
-  String wifi_pass = "";
-  String reqUserKey = "STm9u5f27O-X4vrvO"; // 私钥
-  String city = "12";                      // 城市
-  String reqUnit = "c";                    // 摄氏
-};
-global_Parameter global_Para;
+
+ global_Parameter global_Para;
 
 struct global_Time
 {
@@ -34,9 +26,7 @@ struct global_Time
   String week;
 };
 
-void savemyData();
-bool readlastdata();
-void wificonnected(wl_status_t wl_status, const char *msg);
+void wificonnected(uint8_t wl_status, const char *msg);
 
 DNSServer dnsServer;  // 创建dnsServer实例
 WebServer server(80); // 开启web服务, 创建TCP SERVER,参数: 端口号,最大连接数
@@ -45,7 +35,6 @@ espWifiConfig myWifiConfig(&dnsServer, &server, wificonnected);
 
 // heartWeather myWeather("STm9u5f27O-X4vrvO");
 
-Preferences preferences;
 
 void setup()
 {
@@ -68,7 +57,7 @@ void setup()
   Serial.println("xTaskNotifyGive  done!");
   delay(1000);
 
-  if (readlastdata())
+  if (readlastdata(&global_Para))
   {
     String lstr = "正在尝试连接WIFI" + global_Para.wifi_ssid;
     _ui_label_set_property(ui_lbMessage, 0, lstr.c_str());
@@ -112,7 +101,7 @@ void loop()
 }
 
 // 界面上显示信息
-void wificonnected(wl_status_t wl_status, const char *msg)
+void wificonnected(uint8_t wl_status, const char *msg)
 {
 
   String lstr = msg;
@@ -127,7 +116,7 @@ void wificonnected(wl_status_t wl_status, const char *msg)
     myWifiConfig.getWifiInfo(ssid, pass);
     global_Para.wifi_ssid = ssid;
     global_Para.wifi_pass = pass;
-    savemyData();
+    savemyData(global_Para);
 
     String lsWifi = "成功连接:(将在10秒后关闭此页面。)";
     lsWifi = lsWifi + "\nWIFI:" + WiFi.SSID().c_str();
@@ -148,47 +137,4 @@ void wificonnected(wl_status_t wl_status, const char *msg)
       lv_img_set_src(wifi_image, &ui_img_wifi_full_png);
     }
   }
-}
-
-// 保存数据
-void savemyData()
-{
-  Serial.println("正在保存信息");
-  preferences.begin("wifi", false, "nvs");
-  preferences.putString("ssid", global_Para.wifi_ssid); // 保存WIFI账号密码
-  preferences.putString("pasd", global_Para.wifi_pass);
-  preferences.putString("reqUserKey", global_Para.reqUserKey);
-  preferences.putString("city", global_Para.city);
-  preferences.end();
-}
-bool readlastdata()
-{
-  Serial.printf("进入readlastdata函数\n");
-  preferences.begin("wifi", false, "nvs");
-  if (!preferences.isKey("ssid"))
-  {
-    Serial.println("未找到ssid..");
-    preferences.end();
-    return false;
-  }
-  else
-  {
-    global_Para.wifi_ssid = preferences.getString("ssid", "none");
-    global_Para.wifi_pass = preferences.getString("pasd", "none");
-    global_Para.reqUserKey = preferences.getString("reqUserKey", "");
-    global_Para.city = preferences.getString("city", ""); // 在EEPROM中找地区信息
-    preferences.end();
-    Serial.printf("ssid = %s\n", global_Para.wifi_ssid);
-    Serial.printf("password = %s\n", global_Para.wifi_pass);
-    Serial.printf("reqUserKey = %s\n", global_Para.reqUserKey);
-    Serial.printf("city = %s\n", global_Para.city);
-    return true;
-  }
-}
-// 清楚数据
-void eraserData()
-{
-  preferences.begin("wifi", false, "nvs");
-  preferences.clear();
-  preferences.end();
 }
