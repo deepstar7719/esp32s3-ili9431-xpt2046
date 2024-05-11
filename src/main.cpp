@@ -2,11 +2,14 @@
 #include "ui/ui.h"
 
 // #include "touch.h"
-#include "./uiport/lv_port_disp.h"
+#include "./uiport/lv_port_gfx_disp.h"
 #include "espWifiConfig.h"
 #include <Preferences.h>
 // #include "heartWeather.h"
 // #include "heartParseJson.h"
+
+
+#define DIRECT_MODE
 
 const int reset_Pin = 0; // 设置重置按键引脚,用于删除WiFi信息
 const int wifi_LED = 2;  // 设置LED引脚
@@ -55,12 +58,13 @@ void setup()
   pinMode(reset_Pin, INPUT_PULLUP); // 按键上拉输入模式(默认高电平输入,按下时下拉接到低电平)
   Serial.begin(115200);             // Set to a high rate for fast image transfer to a PC
 
-  lv_port_tftespi_Init();
+  //lv_port_tftespi_Init();
+  lv_port_gfx_Init();
   Serial.println("init tftespidrv done!");
   ui_init();
   Serial.println("ui_init  done!");
   // 一切就绪, 启动LVGL任务
-  xTaskNotifyGive(handleTaskLvgl);
+  //xTaskNotifyGive(handleTaskLvgl);
   Serial.println("xTaskNotifyGive  done!");
   delay(1000);
 
@@ -86,6 +90,7 @@ void setup()
 
 void loop()
 {
+  Lvgl_gfx_Loop();
   // 长按5秒(P0)清除网络配置信息
   if (!digitalRead(reset_Pin))
   {

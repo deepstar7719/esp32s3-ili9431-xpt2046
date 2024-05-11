@@ -1,4 +1,4 @@
-bblanchon/ArduinoJson@6.21.5
 paulstoffregen/XPT2046_Touchscreen@1.4.0
-bodmer/TFT_eSPI@^2.5.43
+bblanchon/ArduinoJson@6.21.5
 lvgl/lvgl@8.3.11
+moononournation/GFX Library for Arduino@^1.4.6
