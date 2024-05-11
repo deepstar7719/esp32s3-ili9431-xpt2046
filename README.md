@@ -10,8 +10,12 @@
  
 
 
-#### 软件架构
-软件架构说明
+#### 软件使用到的组件
+软件使用的组件列表如下：
+	lvgl/lvgl@8.3.11
+	paulstoffregen/XPT2046_Touchscreen@1.4.0
+	bblanchon/ArduinoJson@6.21.5
+	moononournation/GFX Library for Arduino@^1.4.6
 
 
 #### 安装教程

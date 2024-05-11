@@ -110,7 +110,7 @@ void lv_port_gfx_Init()
     lv_port_gfx_disp_init(gfx);
     printf("lvInitDone\n");
     // 在核心2上执行LVGL
-    // xTaskCreatePinnedToCore(TaskLvglUpdate, "LvglThread", 20480, gfx, configMAX_PRIORITIES, &handleTaskLvgl, 1);
+      xTaskCreatePinnedToCore(TaskLvglUpdate, "LvglThread", 20480, gfx, configMAX_PRIORITIES, &handleTaskLvgl, 1);
 }
 
 /**

@@ -64,7 +64,7 @@ void setup()
   ui_init();
   Serial.println("ui_init  done!");
   // 一切就绪, 启动LVGL任务
-  //xTaskNotifyGive(handleTaskLvgl);
+   xTaskNotifyGive(handleTaskLvgl);
   Serial.println("xTaskNotifyGive  done!");
   delay(1000);
 
@@ -90,7 +90,7 @@ void setup()
 
 void loop()
 {
-  Lvgl_gfx_Loop();
+  //Lvgl_gfx_Loop();
   // 长按5秒(P0)清除网络配置信息
   if (!digitalRead(reset_Pin))
   {
