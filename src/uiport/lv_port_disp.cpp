@@ -33,6 +33,10 @@ void lv_port_tftespi_Init()
   screen.setRotation(3); // 横向
   screen.fillScreen(TFT_WHITE);
 
+
+    pinMode(TFT_BL, OUTPUT);
+    digitalWrite(TFT_BL, HIGH);
+
   /* lvgl初始化 */
   lv_init();
   lv_port_disp_init(&screen);

@@ -10,9 +10,12 @@
  
 
 
-#### 软件架构
-软件架构说明
-
+#### 软件使用组件
+软件使用到的组件如下：
+	lvgl/lvgl@8.3.11
+	bodmer/TFT_eSPI@^2.5.43
+	paulstoffregen/XPT2046_Touchscreen@1.4.0
+	bblanchon/ArduinoJson@6.21.5
 
 #### 安装教程
 
