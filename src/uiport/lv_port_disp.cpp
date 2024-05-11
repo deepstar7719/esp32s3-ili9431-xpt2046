@@ -30,13 +30,13 @@ void lv_port_tftespi_Init()
   /* 屏幕初始化 */
   screen.begin();
   screen.initDMA(true);
-  screen.setRotation(1); // 横向
-  screen.fillScreen(TFT_BLACK);
+  screen.setRotation(3); // 横向
+  screen.fillScreen(TFT_WHITE);
 
   /* lvgl初始化 */
   lv_init();
   lv_port_disp_init(&screen);
-  printf("lvInitDone\n");
+  printf("lv_Init_Done\n");
   // 在核心2上执行LVGL
   xTaskCreatePinnedToCore(TaskLvglUpdate, "LvglThread", 20480, nullptr,
                           configMAX_PRIORITIES, &handleTaskLvgl, 1);

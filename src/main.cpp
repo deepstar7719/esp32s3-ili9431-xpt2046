@@ -5,12 +5,8 @@
 #include "./uiport/lv_port_disp.h"
 #include "espWifiConfig.h"
 #include <Preferences.h>
-#include "heartWeather.h"
-#include "heartParseJson.h"
-#include "chipsetInfo.h"
-#include <string>
-
-extern String getMac();
+// #include "heartWeather.h"
+// #include "heartParseJson.h"
 
 const int reset_Pin = 0; // 设置重置按键引脚,用于删除WiFi信息
 const int wifi_LED = 2;  // 设置LED引脚
@@ -44,32 +40,36 @@ WebServer server(80); // 开启web服务, 创建TCP SERVER,参数: 端口号,最
 
 espWifiConfig myWifiConfig(&dnsServer, &server, wificonnected);
 
-heartWeather myWeather("STm9u5f27O-X4vrvO");
+// heartWeather myWeather("STm9u5f27O-X4vrvO");
 
 Preferences preferences;
 
 void setup()
 {
-
-  String mac =getMac().substring(4,8);
-  myWifiConfig.setApssid(mac);
+  Serial.println("begin setup!");
+  // String mac = getMac().substring(4, 8);
+  myWifiConfig.setApssid("A");
   // put your setup code here, to run once:
   pinMode(wifi_LED, OUTPUT);        // 配置LED口为输出口
   digitalWrite(wifi_LED, LOW);      // 初始灯灭
   pinMode(reset_Pin, INPUT_PULLUP); // 按键上拉输入模式(默认高电平输入,按下时下拉接到低电平)
   Serial.begin(115200);             // Set to a high rate for fast image transfer to a PC
-  lv_port_tftespi_Init();
 
+  lv_port_tftespi_Init();
+  Serial.println("init tftespidrv done!");
   ui_init();
+  Serial.println("ui_init  done!");
   // 一切就绪, 启动LVGL任务
   xTaskNotifyGive(handleTaskLvgl);
-
+  Serial.println("xTaskNotifyGive  done!");
   delay(1000);
 
   if (readlastdata())
   {
     String lstr = "正在尝试连接WIFI" + global_Para.wifi_ssid;
     _ui_label_set_property(ui_lbMessage, 0, lstr.c_str());
+
+    Serial.println(lstr.c_str());
     delay(900);
     myWifiConfig.connectToWifi();
   }
@@ -78,6 +78,8 @@ void setup()
     delay(1000);
     String lstr = "请按以上说说配网，尝试连接您家的WIFI！";
     _ui_label_set_property(ui_lbMessage, 0, lstr.c_str());
+
+    Serial.println(lstr.c_str());
     myWifiConfig.wifiConfigured();
   }
 }
@@ -103,13 +105,14 @@ void loop()
 
   delay(30);
 }
- 
+
 // 界面上显示信息
 void wificonnected(wl_status_t wl_status, const char *msg)
 {
 
   String lstr = msg;
   _ui_label_set_property(ui_lbMessage, 0, lstr.c_str());
+  Serial.println(lstr.c_str());
   delay(400);
   if (wifi_status != wl_status && wl_status == WL_CONNECTED)
   {
@@ -126,7 +129,7 @@ void wificonnected(wl_status_t wl_status, const char *msg)
     lsWifi = lsWifi + "\n闹钟IP:" + WiFi.localIP().toString().c_str();
 
     _ui_label_set_property(ui_lbwifiInstr, 0, lsWifi.c_str());
-
+    Serial.println(lsWifi.c_str());
     lv_obj_t *wifi_image = ui_comp_get_child(ui_panelTop1, 1);
     if (wifi_image != NULL)
     {

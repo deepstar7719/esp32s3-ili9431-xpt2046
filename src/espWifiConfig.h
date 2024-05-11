@@ -34,7 +34,7 @@ protected:
   String _wifi_pass = "";      // 暂时存储wifi账号密码
 
   const int _led_PIN = 2;
-  String _ap_SSID = "ESP32"; // 设置AP热点名称
+  String _ap_SSID = "ESP32_"; // 设置AP热点名称
   IPAddress _apIP;           // 设置AP的IP地址
 
   DNSServer *_dnsServer = nullptr; // 创建dnsServer实例
@@ -47,7 +47,7 @@ public:
 
   void setApssid(String  ssid)
   {
-    _ap_SSID = ssid;
+    _ap_SSID = _ap_SSID+ssid;
   };
   void setWifiInfo(String &ssid, String &pass)
   {

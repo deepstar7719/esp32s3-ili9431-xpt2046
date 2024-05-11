@@ -16,7 +16,7 @@
 #define TFT_DC    14  // DC
 #define TFT_MOSI  11  // SDI(MOSI) && T_DIN     (FSPI D)
 #define TFT_SCLK  12  // SCK && T_CLK           (FSPI CLK)
-#define TFT_BL   7
+#define TFT_BL   9
 #define TFT_MISO  13  // SDI(MISO)  && T_DO     (FSPI Q)
 
 
