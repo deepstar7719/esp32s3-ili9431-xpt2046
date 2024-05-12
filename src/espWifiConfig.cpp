@@ -7,16 +7,14 @@ espWifiConfig::espWifiConfig(DNSServer *dnsServer, WebServer *server)
   _server = server;
 }
 
-espWifiConfig::espWifiConfig(DNSServer *dnsServer, WebServer *server, THandlerFunction fn)
-    : _apIP(192, 168, 4, 1)
-{
-  _dnsServer = dnsServer;
-  _server = server;
-  _fn = fn;
-}
+ 
 
 espWifiConfig::~espWifiConfig()
 {
+}
+void espWifiConfig::ui_handler_register(ui_handler_cb *handler)
+{
+  uihandler = handler;
 }
 // 用于配置WiFi
 void espWifiConfig::wifiConfigured()
@@ -32,7 +30,6 @@ void espWifiConfig::initSoftAP()
   WiFi.mode(WIFI_AP);                                           // 配置为AP模式
   WiFi.softAPConfig(_apIP, _apIP, IPAddress(255, 255, 255, 0)); // 设置AP热点IP和子网掩码
 
- 
   if (WiFi.softAP(_ap_SSID.c_str()))
   { // 开启AP热点,如需要密码则添加第二个参数
     // 打印相关信息
@@ -135,11 +132,11 @@ void espWifiConfig::handleConfigWifi()
   }
   _server->send(200, "text/html", "<meta charset='UTF-8'>SSID：" + _wifi_ssid + "<br />password：" + _wifi_pass + "<br />已取得WiFi信息,正在尝试连接,请手动关闭此页面。"); // 返回保存成功页面
 
-  if (_fn != NULL)
-  {
-    _fn(WiFi.status(), "已取得WiFi信息,正在尝试连接......");
-  }
-
+ 
+    if (uihandler->tip_message != NULL)
+    {
+      uihandler->tip_message("已取得WiFi信息,正在尝试连接......");
+    }
   delay(2000);
   WiFi.softAPdisconnect(true); // 参数设置为true，设备将直接关闭接入点模式，即关闭设备所建立的WiFi网络。
   _server->close();            // 关闭web服务
@@ -238,9 +235,19 @@ void espWifiConfig::connectToWifi()
   }
   if (WiFi.status() == WL_CONNECTED)
   {
-    if (_fn != NULL)
+     if (uihandler == NULL)
     {
-      _fn(WL_CONNECTED, "WIFI连接成功！");
+       Serial.println("uihandler is  NULL!");
+      return;
+    }
+
+    if (uihandler->tip_message != NULL)
+    {
+      uihandler->tip_message("WIFI连接成功！......");
+    }
+   if (uihandler->ui_handelr != NULL)
+    {
+      uihandler->ui_handelr(WL_CONNECTED);
     }
     Serial.println("WIFI connect Success");
     Serial.printf("SSID:%s", WiFi.SSID().c_str());
@@ -281,7 +288,7 @@ void espWifiConfig::checkConnect(bool reConnect)
 {
   if (WiFi.status() != WL_CONNECTED)
   {
-      Serial.println("WIFI未连接.");
+    Serial.println("WIFI未连接.");
     //  Serial.println(WiFi.status());
     if (digitalRead(_led_PIN) != LOW)
     {
@@ -293,9 +300,10 @@ void espWifiConfig::checkConnect(bool reConnect)
       Serial.println("WiFi Mode:");
       Serial.println(WiFi.getMode());
       Serial.println("正在连接WiFi...");
-      if (_fn != NULL)
+    
+      if (uihandler != NULL && uihandler->tip_message != NULL)
       {
-        _fn(WiFi.status(), "正在连接WiFi...");
+        uihandler->tip_message("正在连接WiFi......");
       }
 
       connectToWifi();

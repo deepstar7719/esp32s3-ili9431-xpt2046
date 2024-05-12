@@ -10,12 +10,14 @@
 
 #define DIRECT_MODE
 
+/*******************
+ *   全局变量、结构体声明
+ ********************/
 const int reset_Pin = 0; // 设置重置按键引脚,用于删除WiFi信息
 const int wifi_LED = 2;  // 设置LED引脚
 uint8_t wifi_status = WL_IDLE_STATUS;
 
-
- global_Parameter global_Para;
+global_Parameter global_Para;
 
 struct global_Time
 {
@@ -25,35 +27,47 @@ struct global_Time
   String date;
   String week;
 };
+/*******************
+ *   需前置声明的函数
+ ********************/
 
-void wificonnected(uint8_t wl_status, const char *msg);
+void wificonnected(wl_status_t wl_status);
+void showMessage(const char *msg);
+
+/*******************
+ *   全局类的声明
+ ********************/
 
 DNSServer dnsServer;  // 创建dnsServer实例
 WebServer server(80); // 开启web服务, 创建TCP SERVER,参数: 端口号,最大连接数
-
-espWifiConfig myWifiConfig(&dnsServer, &server, wificonnected);
-
+espWifiConfig myWifiConfig(&dnsServer, &server);
 // heartWeather myWeather("STm9u5f27O-X4vrvO");
+ui_callback_handler ui_wifi_hdl;
 
-
+// setup开始
 void setup()
 {
   Serial.println("begin setup!");
   // String mac = getMac().substring(4, 8);
+  // 初始化WIf功能
   myWifiConfig.setApssid("A");
+  ui_wifi_hdl.tip_message = &showMessage;
+  ui_wifi_hdl.ui_handelr=&wificonnected;
+  myWifiConfig.ui_handler_register(&ui_wifi_hdl);
+
   // put your setup code here, to run once:
   pinMode(wifi_LED, OUTPUT);        // 配置LED口为输出口
   digitalWrite(wifi_LED, LOW);      // 初始灯灭
   pinMode(reset_Pin, INPUT_PULLUP); // 按键上拉输入模式(默认高电平输入,按下时下拉接到低电平)
   Serial.begin(115200);             // Set to a high rate for fast image transfer to a PC
 
-  //lv_port_tftespi_Init();
+  
   lv_port_gfx_Init();
   Serial.println("init tftespidrv done!");
   ui_init();
   Serial.println("ui_init  done!");
   // 一切就绪, 启动LVGL任务
-   xTaskNotifyGive(handleTaskLvgl);
+  xTaskNotifyGive(handleTaskLvgl);
   Serial.println("xTaskNotifyGive  done!");
   delay(1000);
 
@@ -79,8 +93,8 @@ void setup()
 
 void loop()
 {
-  //Lvgl_gfx_Loop();
-  // 长按5秒(P0)清除网络配置信息
+ 
+  //  长按5秒(P0)清除网络配置信息
   if (!digitalRead(reset_Pin))
   {
     delay(5000);
@@ -101,13 +115,16 @@ void loop()
 }
 
 // 界面上显示信息
-void wificonnected(uint8_t wl_status, const char *msg)
+void showMessage(const char *msg)
 {
-
   String lstr = msg;
   _ui_label_set_property(ui_lbMessage, 0, lstr.c_str());
   Serial.println(lstr.c_str());
   delay(400);
+}
+
+void wificonnected(wl_status_t wl_status)
+{ 
   if (wifi_status != wl_status && wl_status == WL_CONNECTED)
   {
     wifi_status = wl_status;
@@ -118,17 +135,20 @@ void wificonnected(uint8_t wl_status, const char *msg)
     global_Para.wifi_pass = pass;
     savemyData(global_Para);
 
+    // 在welcome页面显示链接成功信息，
     String lsWifi = "成功连接:(将在10秒后关闭此页面。)";
     lsWifi = lsWifi + "\nWIFI:" + WiFi.SSID().c_str();
     lsWifi = lsWifi + "\n闹钟IP:" + WiFi.localIP().toString().c_str();
-
     _ui_label_set_property(ui_lbwifiInstr, 0, lsWifi.c_str());
     Serial.println(lsWifi.c_str());
+    // 更换wifi状态icon
     lv_obj_t *wifi_image = ui_comp_get_child(ui_panelTop1, 1);
     if (wifi_image != NULL)
     {
       lv_img_set_src(wifi_image, &ui_img_wifi_full_png);
     }
+   
+
     delay(10000);
     _ui_screen_change(&ui_scToday, LV_SCR_LOAD_ANIM_NONE, 0, 0, NULL);
     wifi_image = ui_comp_get_child(ui_panelTop2, 1);

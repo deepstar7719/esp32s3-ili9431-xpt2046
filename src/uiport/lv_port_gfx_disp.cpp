@@ -120,7 +120,7 @@ void lv_port_gfx_Init()
  * @param  color_p:刷新缓冲区地址
  * @retval 无
  */
-static void disp_flush_cb(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *color_p)
+static void my_disp_flush_cb(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *color_p)
 {
     Arduino_GFX *gfx = (Arduino_GFX *)disp->user_data;
 
@@ -204,7 +204,7 @@ void lv_port_gfx_disp_init(Arduino_GFX *gfx)
         /* Change the following line to your display resolution */
         disp_drv.hor_res = screenWidth;
         disp_drv.ver_res = screenHeight;
-        disp_drv.flush_cb = disp_flush_cb;
+        disp_drv.flush_cb = my_disp_flush_cb;
         disp_drv.user_data = gfx;
         disp_drv.draw_buf = &draw_buf;
 #ifdef DIRECT_MODE

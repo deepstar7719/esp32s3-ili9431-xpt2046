@@ -19,13 +19,22 @@
 // 定义成功页面HTML源代码
 #define SUCCESS_HTML "<html lang=\"zh\"><head><meta charset=\"UTF-8\"><body><font size=\"10\">WIFI链接成功！<br />请手动关闭本页面</font></body></html>"
 
+typedef struct ui_callback_handler
+{
+  //std::function<void(wl_status_t, const char *)> THandlerFunction;
+  void(* tip_message)(const char *msg);
+  void(* ui_handelr)(wl_status_t wl_status);
+}ui_handler_cb;
+
 class espWifiConfig
 {
 
 protected:
-  typedef std::function<void(wl_status_t, const char *)> THandlerFunction;
+//typedef std::function<void(wl_status_t, const char *)> THandlerFunction;
+ 
 
-  THandlerFunction _fn = NULL;
+
+  ui_handler_cb *uihandler = NULL;
 
 protected:
   String _scanNetworksID = ""; // 用于储存扫描到的WiFi ID
@@ -35,20 +44,22 @@ protected:
 
   const int _led_PIN = 2;
   String _ap_SSID = "ESP32_"; // 设置AP热点名称
-  IPAddress _apIP;           // 设置AP的IP地址
+  IPAddress _apIP;            // 设置AP的IP地址
 
   DNSServer *_dnsServer = nullptr; // 创建dnsServer实例
   WebServer *_server = nullptr;    // 开启web服务, 创建TCP SERVER,参数: 端口号,最大连接数
 
 public:
   espWifiConfig(DNSServer *dnsServer, WebServer *server);
-  espWifiConfig(DNSServer *dnsServer, WebServer *server, THandlerFunction fn);
+  
   virtual ~espWifiConfig();
 
-  void setApssid(String  ssid)
+  void setApssid(String ssid)
   {
-    _ap_SSID = _ap_SSID+ssid;
+    _ap_SSID = _ap_SSID + ssid;
   };
+  void ui_handler_register(ui_handler_cb *handler);
+
   void setWifiInfo(String &ssid, String &pass)
   {
     _wifi_ssid = ssid;
