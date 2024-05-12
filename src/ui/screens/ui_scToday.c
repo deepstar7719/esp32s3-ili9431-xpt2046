@@ -69,7 +69,7 @@ void ui_scToday_screen_init(void)
 
 
     ui_ImgIcon = lv_img_create(ui_scToday);
-    lv_img_set_src(ui_ImgIcon, &ui_img_black_wl_0_icon_png);
+    lv_img_set_src(ui_ImgIcon, &ui_img_white_wl_13_sm_png);
     lv_obj_set_width(ui_ImgIcon, LV_SIZE_CONTENT);   /// 1
     lv_obj_set_height(ui_ImgIcon, LV_SIZE_CONTENT);    /// 1
     lv_obj_set_x(ui_ImgIcon, -115);
@@ -85,7 +85,7 @@ void ui_scToday_screen_init(void)
     lv_obj_set_y(ui_lbtemp, 60);
     lv_obj_set_align(ui_lbtemp, LV_ALIGN_CENTER);
     lv_label_set_long_mode(ui_lbtemp, LV_LABEL_LONG_DOT);
-    lv_label_set_text(ui_lbtemp, "晴 15");
+    lv_label_set_text(ui_lbtemp, "小雨 15");
     lv_obj_set_style_text_font(ui_lbtemp, &ui_font_syHeiTi16, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_lbdesc = lv_label_create(ui_scToday);

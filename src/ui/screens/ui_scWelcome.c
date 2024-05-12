@@ -12,7 +12,7 @@ void ui_scWelcome_screen_init(void)
 
     ui_panelTop1 = ui_cmPanelTop_create(ui_scWelcome);
     lv_obj_set_x(ui_panelTop1, 0);
-    lv_obj_set_y(ui_panelTop1, -104);
+    lv_obj_set_y(ui_panelTop1, -102);
 
 
 

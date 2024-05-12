@@ -1,7 +1,7 @@
 
 #include "heartParseJson.h"
 
- 
+ extern request_Result req_Result;
 
 // 解析now接口数据
   int parseJsonNow(String data)

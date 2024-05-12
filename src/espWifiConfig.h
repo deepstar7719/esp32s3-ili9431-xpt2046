@@ -19,7 +19,7 @@
 // 定义成功页面HTML源代码
 #define SUCCESS_HTML "<html lang=\"zh\"><head><meta charset=\"UTF-8\"><body><font size=\"10\">WIFI链接成功！<br />请手动关闭本页面</font></body></html>"
 
-typedef struct ui_callback_handler
+typedef struct  
 {
   //std::function<void(wl_status_t, const char *)> THandlerFunction;
   void(* tip_message)(const char *msg);

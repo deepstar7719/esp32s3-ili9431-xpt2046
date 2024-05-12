@@ -7,15 +7,19 @@
 2. LVGL界面UI使用SquareLine 1.4.0设计生成
 3. TFT_eSPI 驱动ILI9431 
 4. TouchScreen驱动xpt2046
- 
+ - 引用的组件：
+1. lvgl/lvgl@8.3.11
+2. paulstoffregen/XPT2046_Touchscreen@1.4.0
+3. bblanchon/ArduinoJson@6.21.5
+4. moononournation/GFX Library for Arduino@^1.4.6 	
+	
+	
+	
 
 
 #### 软件使用到的组件
 软件使用的组件列表如下：
-	lvgl/lvgl@8.3.11
-	paulstoffregen/XPT2046_Touchscreen@1.4.0
-	bblanchon/ArduinoJson@6.21.5
-	moononournation/GFX Library for Arduino@^1.4.6
+
 
 
 #### 安装教程

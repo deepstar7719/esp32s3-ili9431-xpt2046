@@ -37,7 +37,7 @@ struct request_Result
         String last_update;
         String today;
 };
-extern request_Result req_Result;
+
 
 int parseJsonNow(String data);
 int parseJsonDaily(String data);

@@ -1,12 +1,11 @@
 #include <Arduino.h>
 #include "ui/ui.h"
-
-#include "./uiport/lv_port_gfx_disp.h"
+#include "uiport/lv_port_gfx_disp.h"
 #include "espWifiConfig.h"
 #include "nvs_data_handle.h"
-#include "lvgldisplayImp.h"
-// #include "heartWeather.h"
-// #include "heartParseJson.h"
+#include "lv_disp_flush_Imp.h"
+#include "heartWeather.h"
+#include "heartParseJson.h"
 // #include "touch.h"
 
 #define DIRECT_MODE
@@ -18,23 +17,21 @@ const int reset_Pin = 0; // 设置重置按键引脚,用于删除WiFi信息
 const int wifi_LED = 2;  // 设置LED引脚
 uint8_t wifi_status = WL_IDLE_STATUS;
 
-struct global_Time
+typedef struct
 {
   unsigned int hour = 0;
   unsigned int minute = 0;
   unsigned int sec = 0;
   String date;
   String week;
-};
+} global_Time;
 
 global_Parameter global_Para;
-
+request_Result req_Result;
 /*******************
  *   需前置声明的函数
  ********************/
 void wificonnected(wl_status_t wl_status);
-
-
 
 /*******************
  *   全局类的声明
@@ -43,10 +40,16 @@ void wificonnected(wl_status_t wl_status);
 DNSServer dnsServer;  // 创建dnsServer实例
 WebServer server(80); // 开启web服务, 创建TCP SERVER,参数: 端口号,最大连接数
 espWifiConfig myWifiConfig(&dnsServer, &server);
-// heartWeather myWeather("STm9u5f27O-X4vrvO");
-ui_callback_handler ui_wifi_hdl;
+heartWeather myWeather("STm9u5f27O-X4vrvO");
+ui_handler_cb ui_wifi_hdl;
 
-// setup开始
+/*******************
+ *   定时器声明
+ ********************/
+
+/*******************
+ *   setup开始
+ ********************/
 void setup()
 {
   Serial.println("begin setup!");
@@ -54,7 +57,7 @@ void setup()
   // 初始化WIf功能
   myWifiConfig.setApssid("A");
   ui_wifi_hdl.tip_message = &showMessage;
-  ui_wifi_hdl.ui_handelr=&wificonnected;
+  ui_wifi_hdl.ui_handelr = &wificonnected;
   myWifiConfig.ui_handler_register(&ui_wifi_hdl);
 
   // put your setup code here, to run once:
@@ -63,7 +66,6 @@ void setup()
   pinMode(reset_Pin, INPUT_PULLUP); // 按键上拉输入模式(默认高电平输入,按下时下拉接到低电平)
   Serial.begin(115200);             // Set to a high rate for fast image transfer to a PC
 
-  
   lv_port_gfx_Init();
   Serial.println("init tftespidrv done!");
   ui_init();
@@ -95,7 +97,7 @@ void setup()
 
 void loop()
 {
- 
+
   //  长按5秒(P0)清除网络配置信息
   if (!digitalRead(reset_Pin))
   {
@@ -105,7 +107,7 @@ void loop()
       Serial.println("\n按键已长按5秒,正在清空网络连保存接信息.");
       myWifiConfig.restoreWifi(); // 删除保存的wifi信息
       eraserData();
-      ESP.restart();              // 重启复位esp32
+      ESP.restart(); // 重启复位esp32
       Serial.println("已重启设备.");
     }
   }
@@ -117,9 +119,8 @@ void loop()
   delay(30);
 }
 
-
 void wificonnected(wl_status_t wl_status)
-{ 
+{
   if (wifi_status != wl_status && wl_status == WL_CONNECTED)
   {
     wifi_status = wl_status;
@@ -140,16 +141,15 @@ void wificonnected(wl_status_t wl_status)
     lv_obj_t *wifi_image = ui_comp_get_child(ui_panelTop1, 1);
     if (wifi_image != NULL)
     {
-      lv_img_set_src(wifi_image, &ui_img_wifi_full_png);
+      lv_img_set_src(wifi_image, &ui_img_png_wifi_full_png);
     }
-   
 
     delay(10000);
     _ui_screen_change(&ui_scToday, LV_SCR_LOAD_ANIM_NONE, 0, 0, NULL);
     wifi_image = ui_comp_get_child(ui_panelTop2, 1);
     if (wifi_image != NULL)
     {
-      lv_img_set_src(wifi_image, &ui_img_wifi_full_png);
+      lv_img_set_src(wifi_image, &ui_img_png_wifi_full_png);
     }
   }
 }

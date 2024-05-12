@@ -22,7 +22,7 @@ lv_obj_t * ui_cmPanelWeather_create(lv_obj_t * comp_parent)
 
     lv_obj_t * cui_ImgIcon;
     cui_ImgIcon = lv_img_create(cui_cmPanelWeather);
-    lv_img_set_src(cui_ImgIcon, &ui_img_black_wl_1_icon_png);
+    lv_img_set_src(cui_ImgIcon, &ui_img_white_wl_16_sm_png);
     lv_obj_set_width(cui_ImgIcon, LV_SIZE_CONTENT);   /// 1
     lv_obj_set_height(cui_ImgIcon, LV_SIZE_CONTENT);    /// 1
     lv_obj_set_x(cui_ImgIcon, -40);
@@ -38,7 +38,7 @@ lv_obj_t * ui_cmPanelWeather_create(lv_obj_t * comp_parent)
     lv_obj_set_x(cui_lbtemp, 33);
     lv_obj_set_y(cui_lbtemp, -26);
     lv_obj_set_align(cui_lbtemp, LV_ALIGN_CENTER);
-    lv_label_set_text(cui_lbtemp, "小雨\n12~20℃");
+    lv_label_set_text(cui_lbtemp, "中雨\n12~20℃");
     lv_obj_set_style_text_font(cui_lbtemp, &ui_font_syHeiTi16, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     lv_obj_t * cui_lbDate;
