@@ -4,6 +4,7 @@
 #include "./uiport/lv_port_gfx_disp.h"
 #include "espWifiConfig.h"
 #include "nvs_data_handle.h"
+#include "lvgldisplayImp.h"
 // #include "heartWeather.h"
 // #include "heartParseJson.h"
 // #include "touch.h"
@@ -17,8 +18,6 @@ const int reset_Pin = 0; // 设置重置按键引脚,用于删除WiFi信息
 const int wifi_LED = 2;  // 设置LED引脚
 uint8_t wifi_status = WL_IDLE_STATUS;
 
-global_Parameter global_Para;
-
 struct global_Time
 {
   unsigned int hour = 0;
@@ -27,12 +26,15 @@ struct global_Time
   String date;
   String week;
 };
+
+global_Parameter global_Para;
+
 /*******************
  *   需前置声明的函数
  ********************/
-
 void wificonnected(wl_status_t wl_status);
-void showMessage(const char *msg);
+
+
 
 /*******************
  *   全局类的声明
@@ -102,6 +104,7 @@ void loop()
     {
       Serial.println("\n按键已长按5秒,正在清空网络连保存接信息.");
       myWifiConfig.restoreWifi(); // 删除保存的wifi信息
+      eraserData();
       ESP.restart();              // 重启复位esp32
       Serial.println("已重启设备.");
     }
@@ -114,14 +117,6 @@ void loop()
   delay(30);
 }
 
-// 界面上显示信息
-void showMessage(const char *msg)
-{
-  String lstr = msg;
-  _ui_label_set_property(ui_lbMessage, 0, lstr.c_str());
-  Serial.println(lstr.c_str());
-  delay(400);
-}
 
 void wificonnected(wl_status_t wl_status)
 { 

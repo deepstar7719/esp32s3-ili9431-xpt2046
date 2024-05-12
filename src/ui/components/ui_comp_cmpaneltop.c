@@ -16,7 +16,7 @@ lv_obj_t * ui_cmPanelTop_create(lv_obj_t * comp_parent)
     lv_obj_set_width(cui_cmPanelTop, lv_pct(100));
     lv_obj_set_height(cui_cmPanelTop, lv_pct(12));
     lv_obj_set_x(cui_cmPanelTop, 0);
-    lv_obj_set_y(cui_cmPanelTop, -204);
+    lv_obj_set_y(cui_cmPanelTop, -104);
     lv_obj_set_align(cui_cmPanelTop, LV_ALIGN_CENTER);
     lv_obj_clear_flag(cui_cmPanelTop, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
 
@@ -61,7 +61,7 @@ lv_obj_t * ui_cmPanelTop_create(lv_obj_t * comp_parent)
     lv_obj_set_x(cui_lbToday1, 18);
     lv_obj_set_y(cui_lbToday1, 0);
     lv_obj_set_align(cui_lbToday1, LV_ALIGN_CENTER);
-    lv_label_set_text(cui_lbToday1, "2024年5月2日  星期四");
+    lv_label_set_text(cui_lbToday1, "2024年1月1日  星期一");
     lv_obj_set_style_text_font(cui_lbToday1, &ui_font_syHeiTi16, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     lv_obj_t ** children = lv_mem_alloc(sizeof(lv_obj_t *) * _UI_COMP_CMPANELTOP_NUM);

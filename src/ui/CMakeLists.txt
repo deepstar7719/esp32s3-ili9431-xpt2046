@@ -8,6 +8,7 @@ SET(SOURCES components/ui_comp_cmpaneltop.c
     components/ui_comp_hook.c
     ui_helpers.c
     ui_events.c
+    ui_img_manager.c
     images/ui_img_wifi_dis_png.c
     images/ui_img_locate_png.c
     images/ui_img_black_wl_0_icon_png.c
