@@ -224,7 +224,7 @@
 #define DF_GFX_CS 10
 #define DF_GFX_DC 14
 #define DF_GFX_RST -1
-#define DF_GFX_BL 9
+#define DF_GFX_BL 7
 
 
 #elif defined(ESP32) && (CONFIG_IDF_TARGET_ESP32C3)

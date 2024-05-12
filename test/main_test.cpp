@@ -6,7 +6,6 @@
 #include "lv_disp_flush_Imp.h"
 #include "heartWeather.h"
 #include "heartParseJson.h"
-#include <Wire.h>
 // #include "touch.h"
 
 #define DIRECT_MODE
@@ -65,22 +64,15 @@ void setup()
   pinMode(wifi_LED, OUTPUT);        // 配置LED口为输出口
   digitalWrite(wifi_LED, LOW);      // 初始灯灭
   pinMode(reset_Pin, INPUT_PULLUP); // 按键上拉输入模式(默认高电平输入,按下时下拉接到低电平)
-
-  // 启动i2c串口
-
-  Wire.begin();
-    Wire.setPins(8,9);
-  Serial.begin(115200); // Set to a high rate for fast image transfer to a PC
+  Serial.begin(115200);             // Set to a high rate for fast image transfer to a PC
 
   lv_port_gfx_Init();
-  Serial.print("init tftespidrv done!\n");
+  Serial.println("init tftespidrv done!");
   ui_init();
-  Serial.print("ui_init  done!\n");
+  Serial.println("ui_init  done!");
   // 一切就绪, 启动LVGL任务
   xTaskNotifyGive(handleTaskLvgl);
-  Serial.print("xTaskNotifyGive  done!\n");
-
-  initTimer(); // start Timer
+  Serial.println("xTaskNotifyGive  done!");
   delay(1000);
 
   if (readlastdata(&global_Para))
@@ -88,8 +80,7 @@ void setup()
     String lstr = "正在尝试连接WIFI" + global_Para.wifi_ssid;
     _ui_label_set_property(ui_lbMessage, 0, lstr.c_str());
 
-    Serial.print(lstr.c_str());
-    Serial.print("\n");
+    Serial.println(lstr.c_str());
     delay(900);
     myWifiConfig.connectToWifi();
   }
@@ -100,7 +91,6 @@ void setup()
     _ui_label_set_property(ui_lbMessage, 0, lstr.c_str());
 
     Serial.println(lstr.c_str());
-    Serial.print("\n");
     myWifiConfig.wifiConfigured();
   }
 }
@@ -114,11 +104,11 @@ void loop()
     delay(5000);
     if (!digitalRead(reset_Pin))
     {
-      Serial.print("\n按键已长按5秒,正在清空网络连保存接信息.\n");
+      Serial.println("\n按键已长按5秒,正在清空网络连保存接信息.");
       myWifiConfig.restoreWifi(); // 删除保存的wifi信息
       eraserData();
       ESP.restart(); // 重启复位esp32
-      Serial.print("已重启设备.\n");
+      Serial.println("已重启设备.");
     }
   }
 
@@ -146,10 +136,7 @@ void wificonnected(wl_status_t wl_status)
     lsWifi = lsWifi + "\nWIFI:" + WiFi.SSID().c_str();
     lsWifi = lsWifi + "\n闹钟IP:" + WiFi.localIP().toString().c_str();
     _ui_label_set_property(ui_lbwifiInstr, 0, lsWifi.c_str());
-
-    Serial.print(lsWifi.c_str());
-    Serial.print('\n');
-
+    Serial.println(lsWifi.c_str());
     // 更换wifi状态icon
     lv_obj_t *wifi_image = ui_comp_get_child(ui_panelTop1, 1);
     if (wifi_image != NULL)
