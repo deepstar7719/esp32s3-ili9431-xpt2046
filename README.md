@@ -1,6 +1,6 @@
 # esp32-TFT_eSPI-ILI9431-XPT2046-Touch
 
-#### 介绍
+#### 软硬介绍
  **   本程序是ESP32-S3+ILI9431(带xpt2046触摸)屏幕，**
 - 硬件环境及驱动：
 1. 选用esp32-s3-DevKitC-1开发板形，配置开启PSRAM，16Mflash
@@ -12,7 +12,7 @@
 1. vscode + platformio
 
 
-#### 软件使用到的组件
+#### 使用到的组件
 
 - UI界面： 
 1. LVGL v8.3.11
