@@ -23,7 +23,9 @@ typedef struct
         int year = 0;
         int temperature = 0;
         String sdate;
-        String stime;
+        String shour;
+        String sminute;
+        String ssecond;
         String week;
 
 } global_Time;

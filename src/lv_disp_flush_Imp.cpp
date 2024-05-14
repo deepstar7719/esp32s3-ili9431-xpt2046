@@ -70,9 +70,9 @@ esp_timer_handle_t timer1 = 0;
 esp_timer_handle_t timer2 = 0;
 
 
-int getNtpTimeL(tm& timeinfo)
+int getNtpTimeL(global_Time& gl_time)
 {
-
+  tm& timeinfo;
   Serial.println("获取网络时间...");
   if (!getLocalTime(&timeinfo))
   {
@@ -142,7 +142,18 @@ int getNtpTimeL(tm& timeinfo)
 // 获取天气的函数
 void timer1_reqWeather_Callback(void *arg)
 {
-  
+    tm timeinfo;
+
+   getNtpTimeL(timeinfo);// 更新时间
+
+  Clock.setSecond(timeinfo.tm_sec);//Set the second 
+  Clock.setMinute(timeinfo.tm_min);//Set the minute 
+  Clock.setHour(timeinfo.tm_hour);  //Set the hour 
+  Clock.setDoW(timeinfo.tm_wday);    //Set the day of the week
+  Clock.setDate(timeinfo.tm_mday);  //Set the date of the month
+  Clock.setMonth(timeinfo.tm_mon);  //Set the month of the year
+  Clock.setYear(timeinfo.tm_year);  //Set the year (Last two digits of the year)
+
 }
 
 // 获取硬件时钟RTC的函数
