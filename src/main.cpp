@@ -18,15 +18,8 @@ const int reset_Pin = 0; // 设置重置按键引脚,用于删除WiFi信息
 const int wifi_LED = 2;  // 设置LED引脚
 uint8_t wifi_status = WL_IDLE_STATUS;
 
-typedef struct
-{
-  unsigned int hour = 0;
-  unsigned int minute = 0;
-  unsigned int sec = 0;
-  String date;
-  String week;
-} global_Time;
-
+ 
+global_Time gl_time;
 global_Parameter global_Para;
 request_Result req_Result;
 /*******************

@@ -11,25 +11,27 @@ const uint32_t sty_orange = 0xFF9000;
 const uint32_t sty_red = 0xFD0D06;
 const uint32_t sty_deep_blue = 0x03406A;
 
+
+
+typedef struct
+{
+        int hour = 0;
+        int minute = 0;
+        int second = 0;
+        int date=  0;
+        int month = 0;
+        int year = 0;
+        int temperature = 0;
+        String sdate;
+        String stime;
+        String week;
+
+} global_Time;
+
 extern lv_obj_t * currentScreen;
 void initTimer(void);
 void showMessage(const char *msg);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+int getNtpTimeL(tm &timeinfo);
 
 #endif // _LV_DISP_FLUSH_IMP_
