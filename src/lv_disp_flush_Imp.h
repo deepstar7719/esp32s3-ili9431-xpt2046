@@ -5,6 +5,8 @@
 #include <Arduino.h>
 #include "ui/ui.h"
 
+#include <esp_sntp.h>
+
 const uint32_t sty_green = 0x0ACF00;
 const uint32_t sty_blue = 0x0A64A4;
 const uint32_t sty_orange = 0xFF9000;
@@ -22,18 +24,28 @@ typedef struct
         int month = 0;
         int year = 0;
         int temperature = 0;
+        int wday;
+        String syear;
+        String smonth;
         String sdate;
         String shour;
         String sminute;
         String ssecond;
         String week;
+        String stime;
 
 } global_Time;
 
 extern lv_obj_t * currentScreen;
 void initTimer(void);
 void showMessage(const char *msg);
-
 int getNtpTimeL(tm &timeinfo);
+// void ATaskSntp(void *pvParameters);
+
+// void Sntp_init(void);
+
+
+
+
 
 #endif // _LV_DISP_FLUSH_IMP_

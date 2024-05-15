@@ -1,3 +1,5 @@
+
+
 #include "lv_disp_flush_Imp.h"
 
 #include "espWifiConfig.h"
@@ -25,16 +27,24 @@ const lv_img_dsc_t *wl_icon[9] = {wp_0, wp_1, wp_2, wp_3, wp_4, wp_5, wp_6, wp_7
 extern global_Time gl_time;
 extern request_Result req_Result;
 DS3231 Clock;
-bool Century=false;
+bool Century = false;
 bool h12;
 bool PM;
+
+const char *zWeek[7] = {
+    "星期一",
+    "星期二",
+    "星期三",
+    "星期四",
+    "星期五",
+    "星期六",
+    "星期日"};
 char *intToCharPtr(int value)
 {
-  char *result = new char[20];  // 分配足够的内存来存储整数的字符串形式
-  sprintf(result, "%d", value); // 将整数转换为字符串
+  char *result = new char[20];    // 分配足够的内存来存储整数的字符串形式
+  sprintf(result, "%02d", value); // 将整数转换为字符串
   return result;
 }
-
 
 /************************************************
  *   界面显示更新相关
@@ -58,9 +68,40 @@ void showMessage(const char *msg)
   delay(400);
 }
 /************************************************
- *   RTC时钟获取数据
+ *   网络时钟获取数据
  ************************************************/
-
+/*******************httpclient.c***********************************************/
+// char *SntpServerNames[3] = {
+//     "ntp1.aliyun.com",
+//     "ntp2.aliyun.com",
+//     "ntp3.aliyun.com"};
+// //ATaskSntp任务
+// void ATaskSntp( void *pvParameters ){
+//     STATION_STATUS Status;
+//     uint32 time;
+//     do{
+//         Status = wifi_station_get_connect_status();
+//         vTaskDelay(100);
+//     }while(Status != STATION_GOT_IP);
+//     printf("task is SNTP\n");
+//     printf("STATION_GOT_IP!\n");
+//     sntp_setservername(0,SntpServerNames[0]);
+//     sntp_setservername(1,SntpServerNames[1]);
+//     sntp_setservername(2,SntpServerNames[2]);
+//     sntp_init();
+//     for(;;){
+//         time = sntp_get_current_timestamp();
+//         if(time){
+//             printf("current date:%s\n",sntp_get_real_time(time));
+//         }
+//         vTaskDelay(500);
+//     }
+//     vTaskDelete(NULL);
+// }
+// //Sntp_init 初始化
+// void Sntp_init(void){
+//     xTaskCreate(ATaskSntp, "Sntp", 512, NULL, 4, NULL);
+// }
 
 /************************************************
  *   定时函数及设置
@@ -69,70 +110,28 @@ esp_timer_handle_t timer0 = 0;
 esp_timer_handle_t timer1 = 0;
 esp_timer_handle_t timer2 = 0;
 
-
-int getNtpTimeL(global_Time& gl_time)
+int getNtpTimeL(global_Time &gl_time)
 {
-  tm& timeinfo;
-  Serial.println("获取网络时间...");
+  tm timeinfo;
+  Serial.print("获取网络时间...\n");
   if (!getLocalTime(&timeinfo))
   {
     delay(2000);
     if (WiFi.status() != WL_CONNECTED)
     {
-   
       Serial.println("网络时间超时!...");
       return WiFi.status();
     }
   }
   else
   {
-    String s;
-    String m;
-    String h;
-    String d;
-    String mon;
-    String montrue;
-    String T;
-    int y;
-    int w;
-    String Zero[1] = {"0"};
-    String week[8] = {"Sun", "Mon", "Tues", "Wednes", "Thur", "Fri", "Sat"};
 
- 
+    gl_time.ssecond = intToCharPtr(timeinfo.tm_sec);
+    gl_time.sminute = intToCharPtr(timeinfo.tm_min);
+    gl_time.shour = intToCharPtr(timeinfo.tm_hour);
 
-    s = timeinfo.tm_sec; // 获取时间参数
-    m = timeinfo.tm_min;
-    h = timeinfo.tm_hour;
-    d = timeinfo.tm_mday;
-    mon = timeinfo.tm_mon;
-    int ss = int(timeinfo.tm_sec);
-    int mm = int(timeinfo.tm_min);
-    int hh = int(timeinfo.tm_hour);
-    int dayd = int(timeinfo.tm_mday);
-    int monm = int(timeinfo.tm_mon); // 转换成int类型，用于判断是否需要补0
-    if (ss < 10)
-    {
-      s = Zero[0] + s;
-    } // 如果小于10的数字在前面补0
-    if (mm < 10)
-    {
-      m = Zero[0] + m;
-    }
-    if (hh < 10)
-    {
-      h = Zero[0] + h;
-    }
-    if (dayd < 10)
-    {
-      d = Zero[0] + d;
-    }
-    montrue = monm + 1; // 月份为0~11所以要加1
-    if (monm < 10)
-    {
-      montrue = Zero[0] + montrue;
-    }
-    y = int(timeinfo.tm_year) + 1900; // 2022年的y值为122，所以加上1900后再显示
-    w = int(timeinfo.tm_wday);        // 星期一
+    gl_time.syear = int(timeinfo.tm_year) + 1900; // 2022年的y值为122，所以加上1900后再显示
+    gl_time.week = int(timeinfo.tm_wday);         // 星期一
 
     Serial.println(&timeinfo, "%A, %Y-%m-%d %H:%M:%S");
   }
@@ -142,35 +141,43 @@ int getNtpTimeL(global_Time& gl_time)
 // 获取天气的函数
 void timer1_reqWeather_Callback(void *arg)
 {
-    tm timeinfo;
 
-   getNtpTimeL(timeinfo);// 更新时间
+  getNtpTimeL(gl_time); // 更新时间
 
-  Clock.setSecond(timeinfo.tm_sec);//Set the second 
-  Clock.setMinute(timeinfo.tm_min);//Set the minute 
-  Clock.setHour(timeinfo.tm_hour);  //Set the hour 
-  Clock.setDoW(timeinfo.tm_wday);    //Set the day of the week
-  Clock.setDate(timeinfo.tm_mday);  //Set the date of the month
-  Clock.setMonth(timeinfo.tm_mon);  //Set the month of the year
-  Clock.setYear(timeinfo.tm_year);  //Set the year (Last two digits of the year)
-
+  Clock.setSecond(gl_time.second); // Set the second
+  Clock.setMinute(gl_time.minute); // Set the minute
+  Clock.setHour(gl_time.hour);     // Set the hour
+  Clock.setDoW(gl_time.wday);      // Set the day of the week
+  Clock.setDate(gl_time.date);     // Set the date of the month
+  Clock.setMonth(gl_time.month);   // Set the month of the year
+  Clock.setYear(gl_time.year);     // Set the year (Last two digits of the year)
 }
 
 // 获取硬件时钟RTC的函数
 void timer2_get_RTC_Callback(void *arg)
 {
-   global_Time *ptime = (global_Time *)arg;
-  ptime->second = Clock.getSecond();
-  ptime->minute = Clock.getMinute();
-  ptime->hour = Clock.getHour(h12, PM);
-  ptime->date = Clock.getDate();
-  ptime->month = Clock.getMonth(Century);
-  ptime->year = Clock.getYear();
+  global_Time *ptime = (global_Time *)arg;
+
+  byte year, month, date, DoW, hour, minute, second;
+
+  Clock.getTime(year, month, date, DoW, hour, minute, second);
+  ptime->second = second;
+  ptime->minute = minute;
+  ptime->hour = hour;
+  ptime->date = date;
+  ptime->month = month;
+  ptime->year = year;
   ptime->year = ptime->year + 2000;
+  ptime->wday = DoW;
+
   ptime->temperature = Clock.getTemperature();
 
-  ptime->sdate = String(ptime->year) + "年" + String(ptime->month) + "月" + String(ptime->date) + "日";
-  ptime->stime = String(ptime->hour) + ":" + String(ptime->minute) + ":" + String(ptime->second);
+  ptime->shour = intToCharPtr(ptime->hour);
+  ptime->sminute = intToCharPtr(ptime->minute);
+  ptime->ssecond = intToCharPtr(ptime->second);
+
+  ptime->sdate = String(ptime->year) + "年" + String(ptime->month) + "月" + String(ptime->date) + "日  " +String(zWeek[DoW]);
+  ptime->stime = ptime->shour + ":" + ptime->sminute + ":" + ptime->ssecond;
 
   Serial.print(ptime->sdate);
   Serial.print('\n');
@@ -186,32 +193,25 @@ void timer2_get_RTC_Callback(void *arg)
     _ui_label_set_property(_lbdate, 0, ptime->sdate.c_str());
   }
 
-  char *hh = intToCharPtr(ptime->hour);
-  char *mm = intToCharPtr(ptime->minute);
-  char *ss = intToCharPtr(ptime->second);
-  _ui_label_set_property(ui_hh, 0, hh);
-  _ui_label_set_property(ui_mm, 0, mm);
-  _ui_label_set_property(ui_ss, 0, ss);
-
+  _ui_label_set_property(ui_hh, 0, ptime->shour.c_str());
+  _ui_label_set_property(ui_mm, 0, ptime->sminute.c_str());
+  _ui_label_set_property(ui_ss, 0, ptime->ssecond.c_str());
 }
 // 一次时定时函数
 void timer0__Callback(void *arg)
 {
-
 }
 void initTimer(void)
 {
-  
+
   esp_timer_create_args_t timer0_arg = {
       .callback = &timer1_reqWeather_Callback,
       .arg = NULL,
-      .name ="controller"
-      };
+      .name = "controller"};
   esp_timer_create_args_t timer1_arg = {
       .callback = &timer0__Callback,
       .arg = NULL,
-      .name = "heartWeather"
-      };
+      .name = "heartWeather"};
 
   esp_timer_create(&timer0_arg, &timer0);
   esp_timer_start_once(timer0, 8 * 1000 * 1000); // 8s后执行一次
@@ -222,51 +222,7 @@ void initTimer(void)
   esp_timer_create_args_t timer2_arg = {
       .callback = &timer2_get_RTC_Callback,
       .arg = &gl_time,
-      .name="RTC"
-      };
+      .name = "RTC"};
   esp_timer_create(&timer2_arg, &timer2);
   esp_timer_start_periodic(timer2, 1000 * 1000); // RTC时钟1s执行一次,周期执行
 }
-
-/*
-// 定时器1中断函数
-void tickerIsr()
-{
-  if (WiFi.status() == WL_CONNECTED)
-  {
-    digitalWrite(wifi_LED, !(digitalRead(wifi_LED)));
-  }
-  else
-  {
-    digitalWrite(wifi_LED, 1);
-  }
-  timeClient.update(); // 更新时间
-  hour = timeClient.getHours();
-  minute = timeClient.getMinutes();
-  sec = timeClient.getSeconds();
-  count++;
-  count1++;
-  if (count1 > 0 && count1 <= 5)
-  {
-    mode = 1;
-  }
-  else if (count1 > 5 && count1 <= 10)
-  {
-    mode = 2;
-  }
-  else if (count1 > 10 && count1 <= 15)
-  {
-    mode = 3;
-  }
-  else
-  {
-    count1 = 0;
-  }
-  if (count > 300)
-  { // 每5分钟复位一次，重新获取时间、天气
-    Serial.println("重新获取时间、天气....");
-    count = 0;
-    requestsWeatherTime = true;
-  }
-}
-*/

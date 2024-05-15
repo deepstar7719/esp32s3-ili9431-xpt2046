@@ -73,6 +73,10 @@ void setup()
   xTaskNotifyGive(handleTaskLvgl);
   Serial.print("xTaskNotifyGive  done!\n");
 
+
+  //创建一个SNTP 校准时间的任务
+//Sntp_init();
+   
   initTimer(); // start Timer
   delay(1000);
 
