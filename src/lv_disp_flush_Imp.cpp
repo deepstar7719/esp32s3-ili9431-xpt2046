@@ -169,6 +169,7 @@ void timer2_get_RTC_Callback(void *arg)
   ptime->year = year;
   ptime->year = ptime->year + 2000;
   ptime->wday = DoW;
+  ptime->week=zWeek[DoW];
 
   ptime->temperature = Clock.getTemperature();
 
@@ -176,7 +177,7 @@ void timer2_get_RTC_Callback(void *arg)
   ptime->sminute = intToCharPtr(ptime->minute);
   ptime->ssecond = intToCharPtr(ptime->second);
 
-  ptime->sdate = String(ptime->year) + "年" + String(ptime->month) + "月" + String(ptime->date) + "日  " +String(zWeek[DoW]);
+  ptime->sdate = String(ptime->year) + "年" + String(ptime->month) + "月" + String(ptime->date) + "日  " +ptime->week;
   ptime->stime = ptime->shour + ":" + ptime->sminute + ":" + ptime->ssecond;
 
   Serial.print(ptime->sdate);
