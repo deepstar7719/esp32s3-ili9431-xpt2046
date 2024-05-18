@@ -8,15 +8,17 @@
 3. 屏幕为ILI9431芯片。（dev分支为TFT_eSPI驱动，A-gfx分支为GFX驱动）
 4. 屏幕带Touch的xpt2046芯片，采用XPT2046_Touchscreen驱动。
  
-- 开发环境：
-1. vscode + platformio
-
-
 #### 使用到的组件
 
 - UI界面： 
 1. LVGL v8.3.11
 2. LVGL界面UI使用SquareLine 1.4.0设计生成
+3. 界面效果如下
+![Alt text](./images/screen_1.png)
+![Alt text](./images/screen_2.png)
+![Alt text](./images/screen_3.png)
+
+
  - 引用的组件：
 1. lvgl/lvgl@8.3.11
 2. paulstoffregen/XPT2046_Touchscreen@1.4.0
