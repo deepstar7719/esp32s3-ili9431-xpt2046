@@ -9,6 +9,10 @@
 #include "heartParseJson.h"
 #include <DS3231.h>
 #include <Wire.h>
+#include <TimeLib.h>
+#include <NtpClientLib.h>
+
+
 const lv_img_dsc_t *wp_0 = &ui_img_white_wl_0_sm_png;
 const lv_img_dsc_t *wp_1 = &ui_img_white_wl_1_sm_png;
 const lv_img_dsc_t *wp_2 = &ui_img_white_wl_2_sm_png;
@@ -110,6 +114,16 @@ esp_timer_handle_t timer0 = 0;
 esp_timer_handle_t timer1 = 0;
 esp_timer_handle_t timer2 = 0;
 
+
+int8_t timeZone = 8;
+const PROGMEM char *ntpServer = "ntp1.aliyun.com";
+
+void getNtpTime()
+{
+   NTP.setInterval (600);
+  NTP.setNTPTimeout (1500);
+  NTP.begin (ntpServer, timeZone, false);
+}
 int getNtpTimeL(global_Time &gl_time)
 {
   tm timeinfo;
