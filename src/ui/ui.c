@@ -24,7 +24,6 @@ lv_obj_t * ui_scToday;
 lv_obj_t * ui_hh;
 lv_obj_t * ui_mm;
 lv_obj_t * ui_mmsymbol;
-lv_obj_t * ui_ssymbol;
 lv_obj_t * ui_ss;
 lv_obj_t * ui_panelTop2;
 lv_obj_t * ui_ImgIcon;

@@ -43,22 +43,15 @@ void ui_scToday_screen_init(void)
     lv_obj_set_style_text_opa(ui_mmsymbol, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui_mmsymbol, &ui_font_dincoros128, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    ui_ssymbol = lv_label_create(ui_scToday);
-    lv_obj_set_width(ui_ssymbol, LV_SIZE_CONTENT);   /// 1
-    lv_obj_set_height(ui_ssymbol, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_x(ui_ssymbol, 35);
-    lv_obj_set_y(ui_ssymbol, -10);
-    lv_obj_set_align(ui_ssymbol, LV_ALIGN_CENTER);
-    lv_label_set_text(ui_ssymbol, ":");
-    lv_obj_set_style_text_font(ui_ssymbol, &ui_font_dincoros64, LV_PART_MAIN | LV_STATE_DEFAULT);
-
     ui_ss = lv_label_create(ui_scToday);
     lv_obj_set_width(ui_ss, LV_SIZE_CONTENT);   /// 1
     lv_obj_set_height(ui_ss, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_x(ui_ss, 69);
-    lv_obj_set_y(ui_ss, -3);
+    lv_obj_set_x(ui_ss, 54);
+    lv_obj_set_y(ui_ss, -2);
     lv_obj_set_align(ui_ss, LV_ALIGN_CENTER);
     lv_label_set_text(ui_ss, "20");
+    lv_obj_set_style_text_color(ui_ss, lv_color_hex(0x808080), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_ss, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui_ss, &ui_font_dincoros64, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_panelTop2 = ui_cmPanelTop_create(ui_scToday);
@@ -73,26 +66,26 @@ void ui_scToday_screen_init(void)
     lv_obj_set_width(ui_ImgIcon, LV_SIZE_CONTENT);   /// 1
     lv_obj_set_height(ui_ImgIcon, LV_SIZE_CONTENT);    /// 1
     lv_obj_set_x(ui_ImgIcon, -115);
-    lv_obj_set_y(ui_ImgIcon, 76);
+    lv_obj_set_y(ui_ImgIcon, 64);
     lv_obj_set_align(ui_ImgIcon, LV_ALIGN_CENTER);
     lv_obj_add_flag(ui_ImgIcon, LV_OBJ_FLAG_ADV_HITTEST);     /// Flags
     lv_obj_clear_flag(ui_ImgIcon, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
 
     ui_lbtemp = lv_label_create(ui_scToday);
-    lv_obj_set_width(ui_lbtemp, 200);
+    lv_obj_set_width(ui_lbtemp, 226);
     lv_obj_set_height(ui_lbtemp, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_x(ui_lbtemp, 28);
-    lv_obj_set_y(ui_lbtemp, 60);
+    lv_obj_set_x(ui_lbtemp, 38);
+    lv_obj_set_y(ui_lbtemp, 48);
     lv_obj_set_align(ui_lbtemp, LV_ALIGN_CENTER);
     lv_label_set_long_mode(ui_lbtemp, LV_LABEL_LONG_DOT);
     lv_label_set_text(ui_lbtemp, "小雨 15");
     lv_obj_set_style_text_font(ui_lbtemp, &ui_font_syHeiTi16, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_lbdesc = lv_label_create(ui_scToday);
-    lv_obj_set_width(ui_lbdesc, 220);
+    lv_obj_set_width(ui_lbdesc, 226);
     lv_obj_set_height(ui_lbdesc, LV_SIZE_CONTENT);    /// 1
     lv_obj_set_x(ui_lbdesc, 38);
-    lv_obj_set_y(ui_lbdesc, 88);
+    lv_obj_set_y(ui_lbdesc, 86);
     lv_obj_set_align(ui_lbdesc, LV_ALIGN_CENTER);
     lv_label_set_text(ui_lbdesc, "西北风 ");
     lv_obj_set_style_text_font(ui_lbdesc, &ui_font_syHeiTi16, LV_PART_MAIN | LV_STATE_DEFAULT);

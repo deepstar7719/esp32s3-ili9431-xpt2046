@@ -30,7 +30,6 @@ extern lv_obj_t * ui_scToday;
 extern lv_obj_t * ui_hh;
 extern lv_obj_t * ui_mm;
 extern lv_obj_t * ui_mmsymbol;
-extern lv_obj_t * ui_ssymbol;
 extern lv_obj_t * ui_ss;
 extern lv_obj_t * ui_panelTop2;
 extern lv_obj_t * ui_ImgIcon;

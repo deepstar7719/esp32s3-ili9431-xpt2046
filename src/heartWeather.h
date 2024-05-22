@@ -45,8 +45,8 @@ String getWind()
   String wind = "";
   wind = wind_direction;
   wind = wind + " " + wind_direction_degree + " 度";
-  wind = wind + "， 风速，" + wind_speed + "km/h";
-  wind = wind + "， 风力等级" + wind_scale + " ";
+  wind = wind + "， 风速" + wind_speed + "km/h";
+  wind = wind + "， 风力等级" + wind_scale ;
   return String(wind);
 }
 
