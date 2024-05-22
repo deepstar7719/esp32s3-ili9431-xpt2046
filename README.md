@@ -31,7 +31,11 @@
 3. bblanchon/ArduinoJson@6.21.5
 4. moononournation/GFX Library for Arduino@^1.4.6 	
 
-#### 更新说明：
+#### 更新说明：  
+2024-5-22
+1. 获取心知3天天气数据，并更新当天
+2. 利用心知接口，实现定位。
+
 2024-5-20
 1. 通过网络获取时间，并校准RTC时钟  
 
