@@ -47,7 +47,7 @@ ui_handler_cb ui_wifi_hdl;
 void setup()
 {
   Serial.println("begin setup!");
-  // String mac = getMac().substring(4, 8);
+
   // 初始化WIf功能
   myWifiConfig.setApssid("A");
   ui_wifi_hdl.tip_message = &showMessage;

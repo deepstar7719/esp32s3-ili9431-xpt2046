@@ -40,9 +40,8 @@ extern lv_obj_t * currentScreen;
 void initTimer(void);
 void showMessage(const char *msg);
 int getNtpTimeL(tm &timeinfo);
-// void ATaskSntp(void *pvParameters);
-
-// void Sntp_init(void);
+void getNtpTime();
+ 
 
 
 
