@@ -75,7 +75,7 @@ int heartWeather::requestsWeather()
     {
       res = httpclient.getString();
       httpclient.end();
-      //Serial.printf("HTTP response: %s\n", res);
+      // Serial.printf("HTTP response: %s\n", res);
 
       parseJsonDaily(res);
     }
@@ -95,9 +95,10 @@ int heartWeather::requestsWeather()
 int heartWeather::parseJsonDaily(String data)
 {
 
-  DynamicJsonDocument doc(500);
+  DynamicJsonDocument doc(2048);
   deserializeJson(doc, data);
-
+  int length = measureJsonPretty(doc);
+  Serial.printf("daily has %d length\n", length);
   const char *date = doc["results"][0]["last_update"];                            // 提取日期
   const char *id = doc["results"][0]["location"]["id"];                           // 提取城市ID
   const char *city_name = doc["results"][0]["location"]["name"];                  // 提取城市名称
@@ -115,9 +116,15 @@ int heartWeather::parseJsonDaily(String data)
   req_Result.locat.path = path;
   req_Result.locat.timezone = timezone;
   req_Result.locat.timezone_offset = timezone_offset;
-  for (int i; i < doc["results"][0]["daily"].size(); i++)
+  // JsonArray data = doc["results"][0]["daily"].as<JsonArray>();
+  int size = doc["results"][0]["daily"].size();
+
+  Serial.printf("daily has %d records\n", size);
+
+  for (int i = 0; i < size; i++)
   {
-     Serial.printf("parseJsonDaily record:%d",i);
+    Serial.printf("parseDaily record:%d", i);
+    Serial.print(" start\n");
     const char *date = doc["results"][0]["daily"][i]["date"];                           // 天气信息
     const char *text_day = doc["results"][0]["daily"][i]["text_day"];                   // 白天天气现象文字"晴",
     int code_day = doc["results"][0]["daily"][i]["code_day"];                           // 白天天气现象代码"0",
@@ -132,7 +139,8 @@ int heartWeather::parseJsonDaily(String data)
     const char *wind_speed = doc["results"][0]["daily"][i]["wind_speed"];               // 风速，单位km/h（当unit=c时）、mph（当unit=f时）"23.4",
     const char *wind_scale = doc["results"][0]["daily"][i]["wind_scale"];               // 风力等级 "4",
     const char *humidity = doc["results"][0]["daily"][i]["humidity"];                   // 相对湿度，0~100，单位为百分比"37"
-
+    Serial.printf("parseDaily record:%d", i);
+    Serial.print(" end\n");
     heart_Daily daily;
 
     daily.date = date;
@@ -152,7 +160,7 @@ int heartWeather::parseJsonDaily(String data)
     req_Result.dailys.push_back(daily);
   }
 
-  Serial.print("parseJsonDaily!");
+  Serial.print("parseJsonDaily finish!");
 
   return 0;
 }

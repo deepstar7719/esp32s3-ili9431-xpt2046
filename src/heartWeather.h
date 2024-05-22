@@ -6,8 +6,9 @@
 #include <ArduinoJson.h>
 #include <vector>
 
-typedef struct
+typedef struct 
 {
+public:
     String date;
     String text_day;           // 白天天气现象文字"晴",
     int code_day;              // 白天天气现象代码"0",
@@ -22,7 +23,40 @@ typedef struct
     String wind_speed;         // 风速，单位km/h（当unit=c时）、mph（当unit=f时）"23.4",
     String wind_scale;         // 风力等级 "4",
     String humidity;           // 相对湿度，0~100，单位为百分比"37"
-} heart_Daily;
+public:
+
+String getWeather()
+{
+  String wheather = "";
+  wheather = text_day;
+  wheather = wheather + " " + high;
+  wheather = wheather + "/" + low + " 度";
+  return String(wheather);
+}
+
+String getRain()
+{
+  String rain = "";
+  return String(rain);
+}
+
+String getWind()
+{
+  String wind = "";
+  wind = wind_direction;
+  wind = wind + " " + wind_direction_degree + " 度";
+  wind = wind + "， 风速，" + wind_speed + "km/h";
+  wind = wind + "， 风力等级" + wind_scale + " ";
+  return String(wind);
+}
+
+String getHumidity()
+{
+    String humidity = "";
+  return String(humidity);
+}
+
+}heart_Daily;
 typedef struct
 {
     String id;              // "WX4FBXXFKE4F",

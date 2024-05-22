@@ -8,17 +8,50 @@
 #include <Wire.h>
 #include <mutex>
 
-const lv_img_dsc_t *wp_0 = &ui_img_white_wl_0_sm_png;
-const lv_img_dsc_t *wp_1 = &ui_img_white_wl_1_sm_png;
-const lv_img_dsc_t *wp_2 = &ui_img_white_wl_2_sm_png;
-const lv_img_dsc_t *wp_3 = &ui_img_white_wl_3_sm_png;
-const lv_img_dsc_t *wp_4 = &ui_img_white_wl_4_sm_png;
-const lv_img_dsc_t *wp_5 = &ui_img_white_wl_5_sm_png;
-const lv_img_dsc_t *wp_6 = &ui_img_white_wl_6_sm_png;
-const lv_img_dsc_t *wp_7 = &ui_img_white_wl_7_sm_png;
-const lv_img_dsc_t *wp_8 = &ui_img_white_wl_8_sm_png;
+const lv_img_dsc_t *wl_icon[40] = {
+    &ui_img_white_wl_0_sm_png,
+    &ui_img_white_wl_1_sm_png,
+    &ui_img_white_wl_2_sm_png,
+    &ui_img_white_wl_3_sm_png,
+    &ui_img_white_wl_4_sm_png,
+    &ui_img_white_wl_5_sm_png,
+    &ui_img_white_wl_6_sm_png,
+    &ui_img_white_wl_7_sm_png,
+    &ui_img_white_wl_8_sm_png,
+    &ui_img_white_wl_9_sm_png,
 
-const lv_img_dsc_t *wl_icon[9] = {wp_0, wp_1, wp_2, wp_3, wp_4, wp_5, wp_6, wp_7, wp_8};
+    &ui_img_white_wl_10_sm_png,
+    &ui_img_white_wl_11_sm_png,
+    &ui_img_white_wl_12_sm_png,
+    &ui_img_white_wl_13_sm_png,
+    &ui_img_white_wl_14_sm_png,
+    &ui_img_white_wl_15_sm_png,
+    &ui_img_white_wl_16_sm_png,
+    &ui_img_white_wl_17_sm_png,
+    &ui_img_white_wl_18_sm_png,
+    &ui_img_white_wl_19_sm_png,
+
+    &ui_img_white_wl_20_sm_png,
+    &ui_img_white_wl_21_sm_png,
+    &ui_img_white_wl_22_sm_png,
+    &ui_img_white_wl_23_sm_png,
+    &ui_img_white_wl_24_sm_png,
+    &ui_img_white_wl_25_sm_png,
+    &ui_img_white_wl_26_sm_png,
+    &ui_img_white_wl_27_sm_png,
+    &ui_img_white_wl_28_sm_png,
+    &ui_img_white_wl_29_sm_png,
+
+    &ui_img_white_wl_30_sm_png,
+    &ui_img_white_wl_31_sm_png,
+    &ui_img_white_wl_32_sm_png,
+    &ui_img_white_wl_33_sm_png,
+    &ui_img_white_wl_34_sm_png,
+    &ui_img_white_wl_35_sm_png,
+    &ui_img_white_wl_36_sm_png,
+    &ui_img_white_wl_37_sm_png,
+    &ui_img_white_wl_38_sm_png,
+    &ui_img_white_wl_99_sm_png};
 
 /************************************************
  *   全局变量声明
@@ -114,10 +147,10 @@ int getNtpTimeL(global_Time &gl_time)
     Serial.print("月：");
     Serial.println(timeinfo.tm_mon);
 
-    int hh = timeinfo.tm_hour < 12 ? timeinfo.tm_hour : timeinfo.tm_hour + 6;
+    int hh =(timeinfo.tm_hour < 12 ? timeinfo.tm_hour : timeinfo.tm_hour + 6);
 
     Serial.print("更新RTC时钟的时间。\n");
-    Serial.printf("更新RTC时间小时为:%d\n",hh);
+    Serial.printf("更新RTC时间小时为:%d\n", hh);
     my_mutex.lock();
     Clock.setClockMode(h12);
     Clock.setSecond(timeinfo.tm_sec);      // Set the second
@@ -153,16 +186,18 @@ void timer1_reqWeather_Callback(void *arg)
   Serial.println("****************reqWeather_Callback**********");
   getNtpTimeL(gl_time); // 更新时间
 
-   
   myWeather.requestsWeather();
 
   String city = req_Result.locat.city_name;
-  String wheather = req_Result.dailys.at(0).text_day;
-  wheather = wheather + req_Result.dailys.at(0).high;
-  wheather = wheather + "/" + req_Result.dailys.at(0).low + "度";
+  heart_Daily daily = req_Result.dailys.at(0);
+
+  String wheather = daily.getWeather();
+  String wind = daily.getWind();
+
   Serial.print("根据天气，获得定位城市：");
   Serial.print(city);
   Serial.println(wheather);
+  // 更换定位
   lv_obj_t *_lbdate = ui_comp_get_child(ui_panelTop1, 3);
   if (_lbdate != NULL)
   {
@@ -178,6 +213,17 @@ void timer1_reqWeather_Callback(void *arg)
   {
     _ui_label_set_property(_lbdate, 0, city.c_str());
   }
+  // 更换天气说明
+  lv_label_set_text(ui_lbtemp, wheather.c_str());
+  lv_label_set_text(ui_lbdesc, wind.c_str());
+
+  // 更换当天图标
+  int code_day = daily.code_day;
+  int code_night = daily.code_night;
+  code_day = (code_day == 99 ? 39 : code_day);
+  code_night = (code_night == 99 ? 39 : code_night);
+
+  lv_img_set_src(ui_ImgIcon, wl_icon[code_day]);
 }
 
 // 获取硬件时钟RTC的函数
