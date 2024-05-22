@@ -3,11 +3,13 @@
 #### 软硬介绍
  **   本程序是ESP32-S3+ILI9431(带xpt2046触摸)屏幕，**
 - 硬件环境及驱动：
-1. 选用esp32-s3-DevKitC-1开发板形，配置开启PSRAM，16Mflash
+1. 选用esp32-s3-DevKitC-1  N16R8 开发板，配置开启PSRAM，16Mflash
 2. 使用DS3231-RTC时钟模块（带温度）
 3. 屏幕为ILI9431芯片。（dev分支为TFT_eSPI驱动，A-gfx分支为GFX驱动）
 4. 屏幕带Touch的xpt2046芯片，采用XPT2046_Touchscreen驱动。
- 
+- 软件环境：
+1. vscode + platformio
+
 #### 使用到的组件
 
 - UI界面： 
