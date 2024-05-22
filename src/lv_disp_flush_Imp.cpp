@@ -3,7 +3,7 @@
 #include "nvs_data_handle.h"
 #include "esp_timer.h"
 #include "heartWeather.h"
-#include "heartParseJson.h"
+
 #include <DS3231.h>
 #include <Wire.h>
 #include <mutex>
@@ -25,6 +25,7 @@ const lv_img_dsc_t *wl_icon[9] = {wp_0, wp_1, wp_2, wp_3, wp_4, wp_5, wp_6, wp_7
  ************************************************/
 extern global_Time gl_time;
 extern request_Result req_Result;
+extern heartWeather myWeather;
 DS3231 Clock;
 bool Century = false;
 bool h12 = false;
@@ -46,6 +47,10 @@ const int daylightOffset_sec = 0;
 void getNtpTime()
 {
   configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
+}
+
+void lvUpdateUIElements()
+{
 }
 
 char *intToCharPtr(int value)
@@ -112,11 +117,12 @@ int getNtpTimeL(global_Time &gl_time)
     int hh = timeinfo.tm_hour < 12 ? timeinfo.tm_hour : timeinfo.tm_hour + 6;
 
     Serial.print("更新RTC时钟的时间。\n");
+    Serial.printf("更新RTC时间小时为:%d\n",hh);
     my_mutex.lock();
     Clock.setClockMode(h12);
     Clock.setSecond(timeinfo.tm_sec);      // Set the second
     Clock.setMinute(timeinfo.tm_min);      // Set the minute
-    Clock.setHour(hh);       // Set the hour
+    Clock.setHour(hh);                     // Set the hour
     Clock.setDoW(timeinfo.tm_wday);        // Set the day of the week
     Clock.setDate(timeinfo.tm_mday);       // Set the date of the month
     Clock.setMonth(timeinfo.tm_mon + 1);   // Set the month of the year
@@ -144,12 +150,40 @@ int getNtpTimeL(global_Time &gl_time)
 // 获取天气的函数
 void timer1_reqWeather_Callback(void *arg)
 {
+  Serial.println("****************reqWeather_Callback**********");
   getNtpTimeL(gl_time); // 更新时间
+
+   
+  myWeather.requestsWeather();
+
+  String city = req_Result.locat.city_name;
+  String wheather = req_Result.dailys.at(0).text_day;
+  wheather = wheather + req_Result.dailys.at(0).high;
+  wheather = wheather + "/" + req_Result.dailys.at(0).low + "度";
+  Serial.print("根据天气，获得定位城市：");
+  Serial.print(city);
+  Serial.println(wheather);
+  lv_obj_t *_lbdate = ui_comp_get_child(ui_panelTop1, 3);
+  if (_lbdate != NULL)
+  {
+    _ui_label_set_property(_lbdate, 0, city.c_str());
+  }
+  _lbdate = ui_comp_get_child(ui_panelTop2, 3);
+  if (_lbdate != NULL)
+  {
+    _ui_label_set_property(_lbdate, 0, city.c_str());
+  }
+  _lbdate = ui_comp_get_child(ui_panelTop3, 3);
+  if (_lbdate != NULL)
+  {
+    _ui_label_set_property(_lbdate, 0, city.c_str());
+  }
 }
 
 // 获取硬件时钟RTC的函数
 void timer2_get_RTC_Callback(void *arg)
 {
+  Serial.println("****************RTC_Callback**********");
   global_Time *ptime = (global_Time *)arg;
 
   byte year, month, date, DoW, hour, minute, second;

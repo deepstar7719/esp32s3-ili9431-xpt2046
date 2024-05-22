@@ -4,8 +4,7 @@
 #include "espWifiConfig.h"
 #include "nvs_data_handle.h"
 #include "lv_disp_flush_Imp.h"
-#include "heartWeather.h"
-#include "heartParseJson.h"
+#include "heartWeather.h" 
 #include <Wire.h>
 // #include "touch.h"
 
@@ -77,7 +76,7 @@ void setup()
   //创建一个SNTP 校准时间的任务
 //Sntp_init();
    
-  initTimer(); // start Timer
+
   delay(1000);
 
   if (readlastdata(&global_Para))
@@ -119,9 +118,9 @@ void loop()
     }
   }
 
-  dnsServer.processNextRequest();  // 检查客户端DNS请求
-  server.handleClient();           // 检查客户端(浏览器)http请求
-  myWifiConfig.checkConnect(true); // 检测网络连接状态，参数true表示如果断开重新连接
+  //dnsServer.processNextRequest();  // 检查客户端DNS请求
+ // server.handleClient();           // 检查客户端(浏览器)http请求
+  //myWifiConfig.checkConnect(true); // 检测网络连接状态，参数true表示如果断开重新连接
 
   delay(30);
 }
@@ -139,7 +138,7 @@ void wificonnected(wl_status_t wl_status)
     savemyData(global_Para);
 
     // 在welcome页面显示链接成功信息，
-    String lsWifi = "成功连接:(将在10秒后关闭此页面。)";
+    String lsWifi = "成功连接:(将在8秒后关闭此页面。)";
     lsWifi = lsWifi + "\nWIFI:" + WiFi.SSID().c_str();
     lsWifi = lsWifi + "\n闹钟IP:" + WiFi.localIP().toString().c_str();
     _ui_label_set_property(ui_lbwifiInstr, 0, lsWifi.c_str());
@@ -153,8 +152,8 @@ void wificonnected(wl_status_t wl_status)
     {
       lv_img_set_src(wifi_image, &ui_img_png_wifi_full_png);
     }
-
-    delay(10000);
+    initTimer(); // start Timer
+    delay(8000);
     _ui_screen_change(&ui_scToday, LV_SCR_LOAD_ANIM_NONE, 0, 0, NULL);
     wifi_image = ui_comp_get_child(ui_panelTop2, 1);
     if (wifi_image != NULL)

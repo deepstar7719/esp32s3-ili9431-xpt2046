@@ -36,13 +36,17 @@ typedef struct
 
 } global_Time;
 
-extern lv_obj_t * currentScreen;
+
 void initTimer(void);
+
+
+
+extern lv_obj_t * currentScreen;
 void showMessage(const char *msg);
 int getNtpTimeL(tm &timeinfo);
 void getNtpTime();
  
-
+void lvUpdateUIElements();
 
 
 

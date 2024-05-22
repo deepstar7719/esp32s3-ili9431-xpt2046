@@ -1,5 +1,7 @@
 #include "heartWeather.h"
 
+extern request_Result req_Result;
+
 heartWeather::heartWeather(String reqUserKey)
 {
   _reqUserKey = reqUserKey;
@@ -9,106 +11,8 @@ heartWeather::~heartWeather()
 {
 }
 
-// 选择天气图标
-void heartWeather::selectIcon(int i)
-{
-  switch (i)
-  {
-  case 0: // 白天晴天
-  case 2:
-    _icon = 1;
-    break;
-
-  case 1: // 晚上晴天
-  case 3:
-    _icon = 12;
-    break;
-  case 6: // 晚上多云
-  case 8:
-    _icon = 2;
-  case 4: // 白天多云
-  case 5:
-  case 7:
-  case 9:
-    _icon = 3;
-    break;
-
-  case 10: // 阵雨(太阳雨)
-    _icon = 4;
-    break;
-
-  case 11: // 雷阵雨
-  case 12:
-    _icon = 5;
-    break;
-
-  case 13: // 小雨
-    _icon = 6;
-    break;
-
-  case 14: // 大到暴雨
-  case 15:
-  case 16:
-  case 17:
-  case 18:
-    _icon = 7;
-    break;
-
-  case 20: // 雪
-  case 21:
-  case 22:
-  case 23:
-  case 24:
-  case 25:
-    _icon = 8;
-    break;
-
-  case 31: // 霾
-    _icon = 9;
-    break;
-
-  case 32: // 风
-  case 33:
-    _icon = 10;
-    break;
-
-  default:
-    _icon = 99;
-    break;
-  }
-}
-
-// 获取网络时间
-int heartWeather::getNtpTime(tm timeinfo)
-{
-
-  Serial.println("获取网络时间...");
-
-  if (!getLocalTime(&timeinfo))
-  {
-    delay(2000);
-    if (WiFi.status() != WL_CONNECTED)
-    {
-      if (_fn != NULL)
-      {
-        _fn(WiFi.status(), "网络时间超时!......");
-      }
-      Serial.println("网络时间超时!...");
-       return WiFi.status();
-    }
-  }
-  else
-  {
-    _hour = timeinfo.tm_hour;  // 更新小时
-    _minute = timeinfo.tm_min; // 更新分钟
-    _sec = timeinfo.tm_sec;    // 获取秒钟
-    Serial.println(&timeinfo, "%A, %Y-%m-%d %H:%M:%S");
-  }
-  return WiFi.status();
-}
-
 // 请求节假日信息（判断今天是否是节假日）
-int heartWeather::requestHoliday(TParseFunction fn_parse)
+int heartWeather::requestHoliday()
 {
 
   String req, res;
@@ -127,42 +31,43 @@ int heartWeather::requestHoliday(TParseFunction fn_parse)
     {
       res = httpclient.getString();
       httpclient.end();
-      fn_parse(res);
+      parseJsonHoliday(res);
     }
     else
     {
       httpclient.end();
       Serial.printf("fail to get getHoliday,code:%d\n", http_code);
-       
     }
   }
   return http_code;
 }
 
 // 请求天气
-int heartWeather::requestsWeather(TParseFunction fn_parse)
+int heartWeather::requestsWeather()
 {
 
   Serial.println("获取天气信息...");
 
-  if (city == "")
+  if (_city == "")
   {
-
-    _reqRes = "/v3/weather/now.json?key=" + _reqUserKey + +"&location=" + "ip" + "&language=zh-Hans&unit=" + _reqUnit;
+    _reqRes = "/v3/weather/daily.json?key=" + _reqUserKey + "&location=" + "ip" + "&language=zh-Hans&unit=" + _reqUnit;
   }
   else
   {
-    _reqRes = "/v3/weather/now.json?key=" + _reqUserKey + +"&location=" + city + "&language=zh-Hans&unit=" + _reqUnit;
+    _reqRes = "/v3/weather/daily.json?key=" + _reqUserKey + "&location=" + _city + "&language=zh-Hans&unit=" + _reqUnit;
   }
   String req, res;
   HTTPClient httpclient;
-  req = (String)_heartHost + _reqRes;
+  req = _heartHost + _reqRes;
 
   if (httpclient.begin(req))
   {
     Serial.println("HTTPclient setUp done!");
+    Serial.println("requst url:" + req);
   }
-  int http_code = httpclient.GET();
+  int http_code = 0;
+
+  http_code = httpclient.GET();
   if (http_code > 0)
   {
     Serial.printf("HTTP get code: %d\n", http_code);
@@ -170,17 +75,134 @@ int heartWeather::requestsWeather(TParseFunction fn_parse)
     {
       res = httpclient.getString();
       httpclient.end();
-      fn_parse(res);
+      //Serial.printf("HTTP response: %s\n", res);
+
+      parseJsonDaily(res);
     }
     else
     {
       httpclient.end();
-      city = "E";
-      weather1 = "E";
-      temputer = "-";
-      Serial.printf("fail to get cityWeather,code:%d\n", http_code);
+      _city = "";
+      // weather1 = "E";
+      // temputer = "-";
+      Serial.printf("[HTTP] GET cityWeather  failed, error: %s\n", httpclient.errorToString(http_code).c_str());
     }
   }
+
   return http_code;
 }
- 
+
+int heartWeather::parseJsonDaily(String data)
+{
+
+  DynamicJsonDocument doc(500);
+  deserializeJson(doc, data);
+
+  const char *date = doc["results"][0]["last_update"];                            // 提取日期
+  const char *id = doc["results"][0]["location"]["id"];                           // 提取城市ID
+  const char *city_name = doc["results"][0]["location"]["name"];                  // 提取城市名称
+  const char *country = doc["results"][0]["location"]["country"];                 // 提取国家
+  const char *path = doc["results"][0]["location"]["path"];                       //  国家全地址
+  const char *timezone = doc["results"][0]["location"]["timezone"];               // 时区中文
+  const char *timezone_offset = doc["results"][0]["location"]["timezone_offset"]; // 时区+08国家
+
+  String today = date;
+  req_Result.last_update = today;
+  req_Result.today = today.substring(0, 10);
+  req_Result.locat.id = id;
+  req_Result.locat.city_name = city_name;
+  req_Result.locat.country = country;
+  req_Result.locat.path = path;
+  req_Result.locat.timezone = timezone;
+  req_Result.locat.timezone_offset = timezone_offset;
+  for (int i; i < doc["results"][0]["daily"].size(); i++)
+  {
+     Serial.printf("parseJsonDaily record:%d",i);
+    const char *date = doc["results"][0]["daily"][i]["date"];                           // 天气信息
+    const char *text_day = doc["results"][0]["daily"][i]["text_day"];                   // 白天天气现象文字"晴",
+    int code_day = doc["results"][0]["daily"][i]["code_day"];                           // 白天天气现象代码"0",
+    const char *text_night = doc["results"][0]["daily"][i]["text_night"];               // 晚间天气现象文字"晴",
+    int code_night = doc["results"][0]["daily"][i]["code_night"];                       // 晚间天气现象代码"1",
+    const char *high = doc["results"][0]["daily"][i]["high"];                           // 当天最高温度  "28",
+    const char *low = doc["results"][0]["daily"][i]["low"];                             // 当天最低温度": "15",
+    const char *rainfall = doc["results"][0]["daily"][i]["rainfall"];                   // 降水量，单位mm "0.00",
+    const char *precip = doc["results"][0]["daily"][i]["precip"];                       //"降水概率，范围0~1，单位百分比（目前仅支持国外城市）"0.00",
+    const char *wind_direction = doc["results"][0]["daily"][i]["wind_direction"];       // 风向文字 东南",
+    int wind_direction_degree = doc["results"][0]["daily"][i]["wind_direction_degree"]; // 风向角度，范围0~360"135",
+    const char *wind_speed = doc["results"][0]["daily"][i]["wind_speed"];               // 风速，单位km/h（当unit=c时）、mph（当unit=f时）"23.4",
+    const char *wind_scale = doc["results"][0]["daily"][i]["wind_scale"];               // 风力等级 "4",
+    const char *humidity = doc["results"][0]["daily"][i]["humidity"];                   // 相对湿度，0~100，单位为百分比"37"
+
+    heart_Daily daily;
+
+    daily.date = date;
+    daily.text_day = text_day;
+    daily.code_day = code_day;
+    daily.text_night = text_night;
+    daily.code_night = code_night;
+    daily.high = high;
+    daily.low = low;
+    daily.rainfall = rainfall;
+    daily.precip = precip;
+    daily.wind_direction = wind_direction;
+    daily.wind_direction_degree = wind_direction_degree;
+    daily.wind_speed = wind_speed;
+    daily.wind_scale = wind_scale;
+    daily.humidity = humidity;
+    req_Result.dailys.push_back(daily);
+  }
+
+  Serial.print("parseJsonDaily!");
+
+  return 0;
+}
+
+// 解析now接口数据
+int heartWeather::parseJsonNow(String data)
+{
+
+  DynamicJsonDocument doc(500);
+  deserializeJson(doc, data);
+
+  const char *date = doc["results"][0]["last_update"];                            // 提取日期
+  const char *id = doc["results"][0]["location"]["id"];                           // 提取城市ID
+  const char *city_name = doc["results"][0]["location"]["name"];                  // 提取城市名称
+  const char *country = doc["results"][0]["location"]["country"];                 // 提取国家
+  const char *path = doc["results"][0]["location"]["path"];                       //  国家全地址
+  const char *timezone = doc["results"][0]["location"]["timezone"];               // 时区中文
+  const char *timezone_offset = doc["results"][0]["location"]["timezone_offset"]; // 时区+08国家
+
+  const char *weather = doc["results"][0]["now"]["text"];    // 天气信息
+  int weathercode = doc["results"][0]["now"]["code"];        // 天气代码
+  const char *tem = doc["results"][0]["now"]["temperature"]; // 温度
+
+  String today = date;
+  req_Result.last_update = today;
+  req_Result.today = today.substring(0, 10);
+  req_Result.locat.id = id;
+  req_Result.locat.city_name = city_name;
+  req_Result.locat.country = country;
+  req_Result.locat.path = path;
+  req_Result.locat.timezone = timezone;
+  req_Result.locat.timezone_offset = timezone_offset;
+
+  Serial.print("parseJsonNow!");
+  Serial.print("city_name: ");
+  Serial.println(city_name);
+  Serial.print("weather: ");
+  Serial.println(weather);
+  Serial.print("weathercode: ");
+  Serial.println(weathercode);
+  Serial.print("tem: ");
+  Serial.println(tem);
+
+  return 0;
+}
+int heartWeather::parseJsonHoliday(String data)
+{
+  return 0;
+}
+// 选择天气图标
+void heartWeather::selectIcon(int i)
+{
+}

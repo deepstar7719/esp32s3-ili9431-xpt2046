@@ -255,9 +255,13 @@ void espWifiConfig::connectToWifi()
     Serial.print("LocalIP:");
     Serial.print(WiFi.localIP());
     Serial.print(" ,GateIP:");
-    Serial.println(WiFi.gatewayIP());
+    Serial.print(WiFi.gatewayIP());
+
+    IPAddress dnsServer = WiFi.dnsIP();
+    Serial.print(" ,DNS Server:");
+    Serial.println(dnsServer);
     Serial.print("WIFI status is:");
-    Serial.print(WiFi.status());
+    Serial.println(WiFi.status());
     digitalWrite(_led_PIN, HIGH);
     _server->stop();
   }
