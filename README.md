@@ -34,7 +34,7 @@ SCL 9
 1. LVGL v8.3.11
 2. LVGL界面UI使用SquareLine 1.4.0设计生成
 3. 界面效果如下：  
-
+ :coffee:  :coffee:  :coffee: 
 ![Alt text](./images/screen_1.png)  
 
 ![Alt text](./images/screen_2.png)  
@@ -49,7 +49,7 @@ SCL 9
 3. bblanchon/ArduinoJson@6.21.5
 4. moononournation/GFX Library for Arduino@^1.4.6 	
 
-#### 更新说明：  
+#### 更新说明  
 2024-5-23
 1. 完成触摸驱动，并且与屏幕共用SPI总线，以便节省针脚。  
 2. 将获取心知天气的方法，由原来timer改为task，并按延时15分钟执行。解决切换到时钟页面时读秒卡2~3秒的问题。  
