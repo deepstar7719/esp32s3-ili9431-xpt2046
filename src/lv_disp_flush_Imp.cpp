@@ -57,8 +57,15 @@ const lv_img_dsc_t *wl_icon[40] = {
  *   全局变量声明
  ************************************************/
 extern global_Time gl_time;
+extern global_Parameter global_Para;
 extern request_Result req_Result;
+extern uint8_t wifi_status;
+
 extern heartWeather myWeather;
+extern espWifiConfig myWifiConfig;
+
+
+SemaphoreHandle_t xMutex;  // 互斥锁句柄
 DS3231 Clock;
 bool Century = false;
 bool h12 = false;
@@ -147,11 +154,13 @@ int getNtpTimeL(global_Time &gl_time)
     Serial.print("月：");
     Serial.println(timeinfo.tm_mon);
 
-    int hh =(timeinfo.tm_hour < 12 ? timeinfo.tm_hour : timeinfo.tm_hour + 6);
+    int hh = (timeinfo.tm_hour < 12 ? timeinfo.tm_hour : timeinfo.tm_hour + 6);
 
     Serial.print("更新RTC时钟的时间。\n");
     Serial.printf("更新RTC时间小时为:%d\n", hh);
-    my_mutex.lock();
+    //my_mutex.lock();
+
+    if (xSemaphoreTake(xMutex, portMAX_DELAY)) {
     Clock.setClockMode(h12);
     Clock.setSecond(timeinfo.tm_sec);      // Set the second
     Clock.setMinute(timeinfo.tm_min);      // Set the minute
@@ -160,8 +169,10 @@ int getNtpTimeL(global_Time &gl_time)
     Clock.setDate(timeinfo.tm_mday);       // Set the date of the month
     Clock.setMonth(timeinfo.tm_mon + 1);   // Set the month of the year
     Clock.setYear(timeinfo.tm_year - 100); // Set the year (Last two digits of the year)
-    my_mutex.unlock();
-
+   // my_mutex.unlock();
+ // 释放互斥锁
+      xSemaphoreGive(xMutex);
+    }
     // gl_time.second = timeinfo.tm_sec;
     // gl_time.minute = timeinfo.tm_min;
     // gl_time.hour = timeinfo.tm_hour;
@@ -308,4 +319,42 @@ void initTimer(void)
       .name = "RTC"};
   esp_timer_create(&timer2_arg, &timer2);
   esp_timer_start_periodic(timer2, 1000 * 1000); // RTC时钟1s执行一次,周期执行
+}
+
+void wificonnected(wl_status_t wl_status)
+{
+  if (wifi_status != wl_status && wl_status == WL_CONNECTED)
+  {
+    wifi_status = wl_status;
+    //  保存变量
+    String ssid, pass;
+    myWifiConfig.getWifiInfo(ssid, pass);
+    global_Para.wifi_ssid = ssid;
+    global_Para.wifi_pass = pass;
+    savemyData(global_Para);
+
+    // 在welcome页面显示链接成功信息，
+    String lsWifi = "成功连接:(将在8秒后关闭此页面。)";
+    lsWifi = lsWifi + "\nWIFI:" + WiFi.SSID().c_str();
+    lsWifi = lsWifi + "\n闹钟IP:" + WiFi.localIP().toString().c_str();
+    _ui_label_set_property(ui_lbwifiInstr, 0, lsWifi.c_str());
+
+    Serial.print(lsWifi.c_str());
+    Serial.print('\n');
+
+    // 更换wifi状态icon
+    lv_obj_t *wifi_image = ui_comp_get_child(ui_panelTop1, 1);
+    if (wifi_image != NULL)
+    {
+      lv_img_set_src(wifi_image, &ui_img_png_wifi_full_png);
+    }
+    initTimer(); // start Timer
+    delay(8000);
+    _ui_screen_change(&ui_scToday, LV_SCR_LOAD_ANIM_NONE, 0, 0, NULL);
+    wifi_image = ui_comp_get_child(ui_panelTop2, 1);
+    if (wifi_image != NULL)
+    {
+      lv_img_set_src(wifi_image, &ui_img_png_wifi_full_png);
+    }
+  }
 }

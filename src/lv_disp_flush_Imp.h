@@ -4,8 +4,8 @@
 #define _LV_DISP_FLUSH_IMP_
 #include <Arduino.h>
 #include "ui/ui.h"
-
-#include <esp_sntp.h>
+#include "espWifiConfig.h"
+//#include <esp_sntp.h>
 
 const uint32_t sty_green = 0x0ACF00;
 const uint32_t sty_blue = 0x0A64A4;
@@ -48,7 +48,7 @@ void getNtpTime();
  
 void lvUpdateUIElements();
 
-
+void wificonnected(wl_status_t wl_status);
 
 
 #endif // _LV_DISP_FLUSH_IMP_

@@ -6,8 +6,13 @@
 
 // 用于初始化完毕后启用LVGL显示的TaskHandle_t
 TaskHandle_t handleTaskLvgl;
-// lvgl显示驱动
 
+/************************************************
+ *   全局变量声明
+ ************************************************/
+extern int16_t touch_last_x , touch_last_y;
+
+ 
 static uint32_t screenWidth;
 static uint32_t screenHeight;
 static uint32_t bufSize;
@@ -26,27 +31,10 @@ Arduino_GFX *gfx = create_default_Arduino_GFX();
 Arduino_DataBus *bus = create_default_Arduino_DataBus();
 
 /* More display class: https://github.com/moononournation/Arduino_GFX/wiki/Display-Class */
-Arduino_GFX *gfx = new Arduino_ILI9341(bus, DF_GFX_RST, 1/* rotation */, false /* IPS */);
+Arduino_GFX *gfx = new Arduino_ILI9341(bus, DF_GFX_RST, DISPLAY_ROTAION/* rotation */, false /* IPS */);
 
 #endif /* !defined(DISPLAY_DEV_KIT) */
 
-void Lvgl_gfx_Loop()
-{
-    lv_timer_handler(); /* let the GUI do its work */
-
-#ifdef DIRECT_MODE
-#if (LV_COLOR_16_SWAP != 0)
-    gfx->draw16bitBeRGBBitmap(0, 0, (uint16_t *)disp_draw_buf, screenWidth, screenHeight);
-#else
-    gfx->draw16bitRGBBitmap(0, 0, (uint16_t *)disp_draw_buf, screenWidth, screenHeight);
-#endif
-#endif // #ifdef DIRECT_MODE
-
-#ifdef CANVAS
-    gfx->flush();
-#endif
-    delay(5);
-}
 // lvgl更新任务
 void TaskLvglUpdate(void *parameter)
 {
@@ -56,7 +44,7 @@ void TaskLvglUpdate(void *parameter)
     for (;;)
     {
          lv_task_handler();
-        //lv_timer_handler(); /* let the GUI do its work */
+ 
 
 #ifdef DIRECT_MODE
 #if (LV_COLOR_16_SWAP != 0)
@@ -103,14 +91,14 @@ void lv_port_gfx_Init()
 #endif
 
     // Init touch device
-    //??   touch_init(gfx->width(), gfx->height(), gfx->getRotation());
+    touch_init(gfx->width(), gfx->height(), gfx->getRotation());
 
     /* lvgl初始化 */
     lv_init();
     lv_port_gfx_disp_init(gfx);
     printf("lvInitDone\n");
     // 在核心2上执行LVGL
-      xTaskCreatePinnedToCore(TaskLvglUpdate, "LvglThread", 20480, gfx, configMAX_PRIORITIES, &handleTaskLvgl, 1);
+    xTaskCreatePinnedToCore(TaskLvglUpdate, "LvglThread", 20480, gfx, configMAX_PRIORITIES, &handleTaskLvgl, 1);
 }
 
 /**
