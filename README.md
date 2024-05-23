@@ -12,21 +12,21 @@
 
 #### 接线针脚定义
 1. 屏幕  
-#define DF_GFX_SCK 12
-#define DF_GFX_MOSI 11
-#define DF_GFX_MISO 13
-#define DF_GFX_CS 10
-#define DF_GFX_DC 14
-#define DF_GFX_RST -1
-#define DF_GFX_BL 7
+#define DF_GFX_SCK 12  
+#define DF_GFX_MOSI 11  
+#define DF_GFX_MISO 13  
+#define DF_GFX_CS 10  
+#define DF_GFX_DC 14  
+#define DF_GFX_RST -1  
+#define DF_GFX_BL 7  
 2. 触摸  
-#define TOUCH_XPT2046_SCK 12
-#define TOUCH_XPT2046_MISO 13
-#define TOUCH_XPT2046_MOSI 11
-#define TOUCH_XPT2046_CS 17
-#define TOUCH_XPT2046_INT 18
+#define TOUCH_XPT2046_SCK 12  
+#define TOUCH_XPT2046_MISO 13  
+#define TOUCH_XPT2046_MOSI 11  
+#define TOUCH_XPT2046_CS 17  
+#define TOUCH_XPT2046_INT 18  
 3. RTC  
-SDA 8
+SDA 8  
 SCL 9  
 
 #### 使用到的组件  
