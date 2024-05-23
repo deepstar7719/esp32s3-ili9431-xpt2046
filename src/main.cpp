@@ -70,10 +70,8 @@ void setup()
   Serial.print("ui_init  done!\n");
   // 一切就绪, 启动LVGL任务
   xTaskNotifyGive(handleTaskLvgl);
-  Serial.print("xTaskNotifyGive  done!\n");
+  Serial.print("xTaskNotifyGive handleTaskLvgl done!\n");
 
-  // 创建一个SNTP 校准时间的任务
-  // ntp_init();
 
   delay(1000);
 

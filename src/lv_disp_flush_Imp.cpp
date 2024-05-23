@@ -3,7 +3,9 @@
 #include "nvs_data_handle.h"
 #include "esp_timer.h"
 #include "heartWeather.h"
-
+// #include <esp_netif.h>
+// #include <esp_netif_types.h>
+// #include <esp_sntp.h>
 #include <DS3231.h>
 #include <Wire.h>
 #include <mutex>
@@ -91,9 +93,15 @@ const char *ntpServer = "ntp1.aliyun.com"; // 阿里云NTP网络时间服务器
 const long gmtOffset_sec = 28800;
 const int daylightOffset_sec = 0;
 
-void getNtpTime()
+void configTimeL()
 {
   configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
+  // esp_sntp_config_t config = ESP_NETIF_SNTP_DEFAULT_CONFIG(ntpServer);
+  // esp_netif_sntp_init(&config);
+  // if (esp_netif_sntp_sync_wait(pdMS_TO_TICKS(10000)) != ESP_OK)
+  // {
+  //   printf("Failed to update system time within 10s timeout");
+  // }
 }
 
 void lvUpdateUIElements()
@@ -135,6 +143,22 @@ void showMessage(const char *msg)
 
 int getNtpTimeL(global_Time &gl_time)
 {
+
+  /*
+  time_t now;
+  char strftime_buf[64];
+  struct tm timeinfo;
+
+  time(&now);
+  // 将时区设置为中国标准时间
+  setenv("TZ", "CST-8", 1);
+  tzset();
+
+  localtime_r(&now, &timeinfo);
+  strftime(strftime_buf, sizeof(strftime_buf), "%c", &timeinfo);
+  ESP_LOGI(TAG, "The current date/time in Shanghai is: %s", strftime_buf);
+  */
+
   tm timeinfo;
   Serial.print("获取网络时间...\n");
   if (!getLocalTime(&timeinfo))
@@ -159,7 +183,6 @@ int getNtpTimeL(global_Time &gl_time)
 
     Serial.print("更新RTC时钟的时间。\n");
     Serial.printf("更新RTC时间小时为:%d\n", hh);
-    // my_mutex.lock();
 
     if (xSemaphoreTake(xMutex, portMAX_DELAY))
     {
@@ -171,8 +194,7 @@ int getNtpTimeL(global_Time &gl_time)
       Clock.setDate(timeinfo.tm_mday);       // Set the date of the month
       Clock.setMonth(timeinfo.tm_mon + 1);   // Set the month of the year
       Clock.setYear(timeinfo.tm_year - 100); // Set the year (Last two digits of the year)
-                                             // my_mutex.unlock();
-                                             // 释放互斥锁
+
       xSemaphoreGive(xMutex);
     }
     // gl_time.second = timeinfo.tm_sec;
@@ -190,6 +212,7 @@ int getNtpTimeL(global_Time &gl_time)
     // gl_time.syear = int(timeinfo.tm_year); // 2022年的y值为122，所以加上1900后再显示
     // gl_time.week = int(timeinfo.tm_wday);  // 星期一
   }
+  Serial.println("获取网络时间结束！");
   return WiFi.status();
 }
 
@@ -197,7 +220,7 @@ int getNtpTimeL(global_Time &gl_time)
 void task_reqWeather_Callback(void *arg)
 {
   Serial.println("****************reqWeather_Callback**********");
-ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+  ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
   while (1)
   {
     getNtpTimeL(gl_time); // 更新时间
@@ -242,7 +265,7 @@ ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
     lv_img_set_src(ui_ImgIcon, wl_icon[code_day]);
 
     // 延迟15分钟一次
-    vTaskDelay(900000 / portTICK_PERIOD_MS);
+    vTaskDelay(840000 / portTICK_PERIOD_MS);
   }
 }
 
@@ -326,8 +349,8 @@ void wificonnected(wl_status_t wl_status)
     xMutex = xSemaphoreCreateMutex();
 
     // 创建获取天气的任务，
-    //xTaskCreate(task_reqWeather_Callback, "heartWeather", 1024, NULL, 1, NULL);
-   xTaskCreatePinnedToCore(task_reqWeather_Callback, "heartWeather", 20480, NULL, configMAX_PRIORITIES, &handleTaskWeather, 0);
+
+    xTaskCreatePinnedToCore(task_reqWeather_Callback, "heartWeather", 20480, NULL, configMAX_PRIORITIES, &handleTaskWeather, 0);
 
     // 在welcome页面显示链接成功信息，
     String lsWifi = "成功连接:(将在8秒后关闭此页面。)";
@@ -345,8 +368,11 @@ void wificonnected(wl_status_t wl_status)
       lv_img_set_src(wifi_image, &ui_img_png_wifi_full_png);
     }
 
-      // 一切就绪, 启动LVGL任务
-  xTaskNotifyGive(handleTaskWeather);
+    // 一切就绪, 启动LVGL任务
+    configTimeL();
+    xTaskNotifyGive(handleTaskWeather);
+    Serial.print("xTaskNotifyGive handleTaskWeather done!\n");
+
     delay(6000);
     initTimer(); // start Timer
     delay(2000);

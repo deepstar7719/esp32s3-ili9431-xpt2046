@@ -44,7 +44,7 @@ void initTimer(void);
 extern lv_obj_t * currentScreen;
 void showMessage(const char *msg);
 int getNtpTimeL(tm &timeinfo);
-void getNtpTime();
+void configTimeL();
  
 void lvUpdateUIElements();
 

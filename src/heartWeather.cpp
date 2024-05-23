@@ -164,7 +164,7 @@ int heartWeather::parseJsonDaily(String data)
     }
     xSemaphoreGive(xMutex);
   }
-  Serial.print("parseJsonDaily finish!");
+  Serial.println("parseJsonDaily finish!");
 
   return 0;
 }
