@@ -50,6 +50,9 @@ SCL 9
 4. moononournation/GFX Library for Arduino@^1.4.6 	
 
 #### 更新说明  
+2024-5-30  
+1.将页面元素的显示更新与页面逻辑分离，分别放到ui_disp_update_imp模块和ui_action_imp模块  
+
 2024-5-23
 1. 完成触摸驱动，并且与屏幕共用SPI总线，以便节省针脚。  
 2. 将获取心知天气的方法，由原来timer改为task，并按延时15分钟执行。解决切换到时钟页面时读秒卡2~3秒的问题。  

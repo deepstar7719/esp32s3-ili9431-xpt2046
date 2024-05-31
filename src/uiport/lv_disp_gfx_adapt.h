@@ -28,7 +28,7 @@
 
 #include <Arduino_GFX_Library.h>
 
-#include "touch_init.h"
+#include "touch_port_adapt.h"
 #include <lvgl.h>
 
 #define DIRECT_MODE // Uncomment to enable full frame buffer

@@ -1,4 +1,4 @@
-#include "touch_init.h"
+#include "touch_port_adapt.h"
 
 
 bool touch_swap_xy = false;
