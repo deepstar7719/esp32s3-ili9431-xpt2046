@@ -1,4 +1,4 @@
-#include "lv_port_gfx_disp.h"
+#include "lv_disp_gfx_adapt.h"
 
 #include <hal/lv_hal_disp.h>
 #include <misc/lv_area.h>

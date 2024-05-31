@@ -1,11 +1,9 @@
+#if !defined(__UI_ACTION_IMP__)
+#define __UI_ACTION_IMP__
+#include "ui_disp_update_Imp.h"
 
 
-#if !defined(_LV_DISP_FLUSH_IMP_)
-#define _LV_DISP_FLUSH_IMP_
-#include <Arduino.h>
-#include "ui/ui.h"
-#include "espWifiConfig.h"
-//#include <esp_sntp.h>
+
 
 const uint32_t sty_green = 0x0ACF00;
 const uint32_t sty_blue = 0x0A64A4;
@@ -36,19 +34,14 @@ typedef struct
 
 } global_Time;
 
-
+extern lv_obj_t * currentScreen;
 void initTimer(void);
 
-
-
-extern lv_obj_t * currentScreen;
-void showMessage(const char *msg);
+char *intToCharPtr(int value);
 int getNtpTimeL(tm &timeinfo);
-void configTimeL();
- 
-void lvUpdateUIElements();
+
+
+void configTimeL(); 
 
 void wificonnected(wl_status_t wl_status);
-
-
-#endif // _LV_DISP_FLUSH_IMP_
+#endif //__UI_ACTION_IMP__

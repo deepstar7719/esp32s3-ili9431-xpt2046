@@ -1,10 +1,11 @@
 #include <Arduino.h>
-#include "ui/ui.h"
-#include "uiport/lv_port_gfx_disp.h"
 #include <Wire.h>
 
+#include "ui/ui.h"
+#include "uiport/lv_disp_gfx_adapt.h"
+#include "uiport/ui_action_Imp.h"
+
 #include "nvs_data_handle.h"
-#include "lv_disp_flush_Imp.h"
 
 #include "espWifiConfig.h"
 #include "heartWeather.h"
