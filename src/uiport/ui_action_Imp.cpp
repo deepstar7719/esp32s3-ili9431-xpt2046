@@ -15,9 +15,9 @@ TaskHandle_t handleTaskWeather;
 /************************************************
  *   定时函数及设置
  ************************************************/
-// esp_timer_handle_t timer0 = 0;
-esp_timer_handle_t timerRTC = 0;
 
+esp_timer_handle_t timerRTC = 0;
+esp_timer_handle_t timerScreenAnim = 0;
 /************************************************
  *   全局变量声明
  ************************************************/
@@ -46,6 +46,21 @@ SemaphoreHandle_t xMutex; // 互斥锁句柄
 //       xSemaphoreGive(xMutex);
 //     }
 /**********互斥锁句柄用法**************************/
+
+#define MAX_SCREEN_NUM 3
+#define SCREEN_ANIM_DELAY 5
+#define WEATHER_OF_OTHER_DAYS 2
+lv_obj_t **lv_anim_screen[MAX_SCREEN_NUM] = {
+    &ui_scWelcome,
+    &ui_scToday,
+    &ui_scWeather};
+int ncurrentScreen = 0;
+
+lv_obj_t * lv_wearther_obj[WEATHER_OF_OTHER_DAYS]={
+  ui_cmPanelWeather1,
+  ui_cmPanelWeather2
+}
+
 const lv_img_dsc_t *wl_icon[40] = {
     &ui_img_white_wl_0_sm_png,
     &ui_img_white_wl_1_sm_png,
@@ -108,24 +123,21 @@ void configTimeL()
   configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
 }
 
-int getNtpTimeL(global_Time &gl_time)
+int getNtpTimeL()
 {
-  time_t now;
-  char strftime_buf[64];
+
+  // time_t now;
+  //   char strftime_buf[64];
   tm timeinfo;
-  /*
-    time(&now);
-    // 将时区设置为中国标准时间
-    setenv("TZ", "CST-8", 1);
-    tzset();
 
-    localtime_r(&now, &timeinfo);
-    strftime(strftime_buf, sizeof(strftime_buf), "%c", &timeinfo);
-    ESP_LOGI(TAG, "The current date/time in Shanghai is: %s", strftime_buf);
+  //   time(&now);
+  //   // 将时区设置为中国标准时间
+  //   setenv("TZ", "CST-8", 1);
+  //   tzset();
+  //     localtime_r(&now, &timeinfo);
+  //     strftime(strftime_buf, sizeof(strftime_buf), "%c", &timeinfo);
+  //     ESP_LOGI(TAG, "The current date/time in Shanghai is: %s", strftime_buf);
 
-   */
-
-  // tm timeinfo;
   Serial.print("获取网络时间...\n");
   if (!getLocalTime(&timeinfo))
   {
@@ -146,20 +158,22 @@ int getNtpTimeL(global_Time &gl_time)
     Serial.println(timeinfo.tm_mon);
 
     int hh = timeinfo.tm_hour;
-    hh = (hh < 12 ? hh : hh + 6);
+    // hh = (hh < 12 ? hh : hh + 6);
+    // hh = (hh > 23 ? 0 : hh);
+
     Serial.print("更新RTC时钟的时间。\n");
     Serial.printf("更新RTC时间小时为:%d\n", hh);
 
     if (xSemaphoreTake(xMutex, portMAX_DELAY))
     {
 
-      Clock.setSecond(timeinfo.tm_sec);      // Set the second
-      Clock.setMinute(timeinfo.tm_min);      // Set the minute
-      Clock.setHour(hh);                     // Set the hour
-      Clock.setDoW(timeinfo.tm_wday);        // Set the day of the week
-      Clock.setDate(timeinfo.tm_mday);       // Set the date of the month
-      Clock.setMonth(timeinfo.tm_mon + 1);   // Set the month of the year
-      Clock.setYear(timeinfo.tm_year - 100); // Set the year (Last two digits of the year)
+      Clock.setSecond(timeinfo.tm_sec);    // Set the second
+      Clock.setMinute(timeinfo.tm_min);    // Set the minute
+      Clock.setHour(hh);                   // Set the hour
+      Clock.setDoW(timeinfo.tm_wday);      // Set the day of the week
+      Clock.setDate(timeinfo.tm_mday);     // Set the date of the month
+      Clock.setMonth(timeinfo.tm_mon + 1); // Set the month of the year
+      Clock.setYear(timeinfo.tm_year);     // Set the year (Last two digits of the year)
 
       xSemaphoreGive(xMutex);
     }
@@ -178,7 +192,7 @@ void task_reqWeather_Callback(void *arg)
   {
 
     // 更新时间
-    getNtpTimeL(gl_time);
+    getNtpTimeL();
     myWeather.requestsWeather();
 
     String city = req_Result.locat.city_name;
@@ -197,8 +211,11 @@ void task_reqWeather_Callback(void *arg)
     Serial.print(city);
     Serial.println(wheather);
 
-    lv_sctoday_update_weather(city, wheather, wind, wl_icon[code_day]);
+    lv_sctoday_update_weather(wheather, wind, wl_icon[code_day]);
+    lv_scWeather_update_otherday_weather();
 
+
+    lv_all_update_location(city);
     // 延迟15分钟一次
     vTaskDelay(840000 / portTICK_PERIOD_MS);
   }
@@ -207,12 +224,13 @@ void task_reqWeather_Callback(void *arg)
 void timer_get_RTC_Callback(void *arg)
 {
   Serial.println("****************RTC_Callback**********");
-  global_Time *ptime = (global_Time *)arg;
+  // global_Time *ptime = (global_Time *)arg;
 
   byte year, month, date, DoW, hour, minute, second;
   byte temper;
 
   Clock.getTime(year, month, date, DoW, hour, minute, second);
+
   month = Clock.getMonth(Century);
 
   temper = Clock.getTemperature();
@@ -237,12 +255,12 @@ void timer_get_RTC_Callback(void *arg)
   hh = intToCharPtr(hour);
   mm = intToCharPtr(minute);
   ss = intToCharPtr(second);
-  sdate = String(year) + "年" + String(month) + "月" + String(date) + "日  " + zWeek[DoW];
+  sdate = String(year + 1900) + "年" + String(month) + "月" + String(date) + "日  " + zWeek[DoW];
   stime = hh + ":" + mm + ":" + ss;
 
   // 显示时分秒
-  lv_sctoday_update_RTC_Time(sdate, hh, mm, ss);
-
+  lv_sctoday_update_RTC_Time( hh, mm, ss);
+lv_all_update_panelTop_Day(sdate);
   // ptime->second = second;
   // ptime->minute = minute;
   // ptime->hour = hour;
@@ -259,12 +277,21 @@ void timer_get_RTC_Callback(void *arg)
 
   // ptime->sdate = String(year) + "年" + String(month) + "月" + String(date) + "日  " + ptime->week;
   // ptime->stime = ptime->shour + ":" + ptime->sminute + ":" + ptime->ssecond;
-
-  Serial.print(stime);
-  Serial.print('\n');
+  Serial.println(sdate);
+  Serial.println(stime);
 }
 
-void initTimer(void)
+void timer_change_sreen_Callback(void *arg)
+{
+  int nindex = ncurrentScreen;
+  nindex++;
+  if (nindex >= MAX_SCREEN_NUM)
+  {
+    nindex = 1;
+  }
+  uiChangeScreen(nindex, LV_SCR_LOAD_ANIM_OVER_RIGHT);
+}
+void initRTCTimer(void)
 {
 
   // 初始化RTC
@@ -276,8 +303,25 @@ void initTimer(void)
   esp_timer_create(&timerRTC_arg, &timerRTC);
   esp_timer_start_periodic(timerRTC, 1000 * 1000); // RTC时钟1s执行一次,周期执行
 }
-
-void wificonnected(wl_status_t wl_status)
+void initScreenAnimTimer()
+{
+  esp_timer_create_args_t timerAnim_arg = {
+      .callback = &timer_change_sreen_Callback,
+      .arg = NULL,
+      .name = "ScreenAnim"};
+  esp_timer_create(&timerAnim_arg, &timerScreenAnim);
+  esp_timer_start_periodic(timerScreenAnim, SCREEN_ANIM_DELAY * 1000 * 1000);
+}
+void uiChangeScreen(int nindex, lv_scr_load_anim_t fademode)
+{
+  if (nindex > -1 && nindex < MAX_SCREEN_NUM)
+  {
+    lv_obj_t **obj = lv_anim_screen[nindex];
+    _ui_screen_change(obj, fademode, 0, 10, NULL);
+    ncurrentScreen = nindex;
+  }
+}
+void wifiConnected(wl_status_t wl_status)
 {
   if (wifi_status != wl_status && wl_status == WL_CONNECTED)
   {
@@ -288,7 +332,8 @@ void wificonnected(wl_status_t wl_status)
     global_Para.wifi_ssid = ssid;
     global_Para.wifi_pass = pass;
     savemyData(global_Para);
-
+    // 更新Wifi状
+    lv_all_update_wifi_status((int)wl_status);
     // 创建互斥锁
     xMutex = xSemaphoreCreateMutex();
 
@@ -297,7 +342,7 @@ void wificonnected(wl_status_t wl_status)
 
     lv_scwelcome_update_tip();
 
-    //时间同步
+    // 时间同步
     configTimeL();
     // esp_wait_sntp_sync();
     // 一切就绪, 启动LVGL任务
@@ -305,17 +350,18 @@ void wificonnected(wl_status_t wl_status)
     Serial.print("xTaskNotifyGive handleTaskWeather done!\n");
 
     delay(6000);
-    // start Timer
-    initTimer(); 
+    // start rtc Timer
+    initRTCTimer();
     delay(2000);
 
-    _ui_screen_change(&ui_scToday, LV_SCR_LOAD_ANIM_NONE, 0, 0, NULL);
+    uiChangeScreen(1, LV_SCR_LOAD_ANIM_NONE);
 
-    lv_all_update_wifi_status((int)wl_status);
+    // start ScreenAnim Timer
+    initScreenAnimTimer();
   }
 }
 
-void changewifistatus(uint8_t wl_wifistatus)
+void changeWifiStatus(uint8_t wl_wifistatus)
 {
   if (wl_wifistatus == WL_CONNECTED)
   {

@@ -37,41 +37,61 @@ void lv_scwelcome_showMessage(const char *msg)
   Serial.println(lstr.c_str());
   delay(400);
 }
-
-void lv_sctoday_update_weather(String &city,String &wheather,String &wind,const lv_img_dsc_t *wicon)
+ 
+void lv_sctoday_update_weather(String &wheather,String &wind,const lv_img_dsc_t *wicon)
+{  
+  // 更换Today页面天气说明
+  lv_label_set_text(ui_lbtemp, wheather.c_str());
+  lv_label_set_text(ui_lbdesc, wind.c_str());
+  // 更换Today页面天气图标
+  lv_img_set_src(ui_ImgIcon, &wicon);
+}
+void lv_scWeather_update_otherday_weather()
 {
-  
 
-    // 更换所有页面定位
-    lv_obj_t *_lbdate = ui_comp_get_child(ui_panelTop1, 3);
-    if (_lbdate != NULL)
-    {
-      lv_label_set_text(_lbdate, city.c_str());
-    }
-    _lbdate = ui_comp_get_child(ui_panelTop2, 3);
-    if (_lbdate != NULL)
-    {
-      lv_label_set_text(_lbdate, city.c_str());
-    }
-    _lbdate = ui_comp_get_child(ui_panelTop3, 3);
-    if (_lbdate != NULL)
-    {
-      lv_label_set_text(_lbdate,   city.c_str());
-    }
-    //更换Today页面天气说明
-    lv_label_set_text(ui_lbtemp, wheather.c_str());
-    lv_label_set_text(ui_lbdesc, wind.c_str());
-    //更换Today页面天气图标
-    lv_img_set_src(ui_ImgIcon, &wicon );
+}
+void lv_all_update_location(String &city)
+{
+  // 更换所有页面定位
+
+  lv_obj_t *_lbdate = ui_comp_get_child(ui_panelTop1, 3);
+  if (_lbdate != NULL)
+  {
+    lv_label_set_text(_lbdate, city.c_str());
+  }
+  _lbdate = ui_comp_get_child(ui_panelTop2, 3);
+  if (_lbdate != NULL)
+  {
+    lv_label_set_text(_lbdate, city.c_str());
+  }
+  _lbdate = ui_comp_get_child(ui_panelTop3, 3);
+  if (_lbdate != NULL)
+  {
+    lv_label_set_text(_lbdate, city.c_str());
+  }
 }
 
-void lv_sctoday_update_RTC_Time(String &sdate, String &hh, String &mm, String &ss)
+void lv_all_update_panelTop_Day(String &sdate)
 {
-  lv_obj_t *_lbdate = ui_comp_get_child(ui_panelTop2, 4);
+  lv_obj_t *_lbdate = ui_comp_get_child(ui_panelTop1, 4);
   if (_lbdate != NULL)
   {
     _ui_label_set_property(_lbdate, 0, sdate.c_str());
   }
+   _lbdate = ui_comp_get_child(ui_panelTop2, 4);
+  if (_lbdate != NULL)
+  {
+    _ui_label_set_property(_lbdate, 0, sdate.c_str());
+  }
+  _lbdate = ui_comp_get_child(ui_panelTop3, 4);
+  if (_lbdate != NULL)
+  {
+    _ui_label_set_property(_lbdate, 0, sdate.c_str());
+  }
+}
+
+void lv_sctoday_update_RTC_Time(  String &hh, String &mm, String &ss)
+{
 
   _ui_label_set_property(ui_hh, 0, hh.c_str());
   _ui_label_set_property(ui_mm, 0, mm.c_str());
