@@ -8,14 +8,32 @@
 3. 屏幕为ILI9431芯片。（dev分支为TFT_eSPI驱动，A-gfx分支为GFX驱动）
 4. 屏幕带Touch的xpt2046芯片，采用XPT2046_Touchscreen驱动。
 - 软件环境：
-1. vscode + platformio
+1. vscode + platformio  
 
-#### 使用到的组件
+#### 接线针脚定义
+1. 屏幕  
+#define DF_GFX_SCK 12  
+#define DF_GFX_MOSI 11  
+#define DF_GFX_MISO 13  
+#define DF_GFX_CS 10  
+#define DF_GFX_DC 14  
+#define DF_GFX_RST -1  
+#define DF_GFX_BL 7  
+2. 触摸  
+#define TOUCH_XPT2046_SCK 12  
+#define TOUCH_XPT2046_MISO 13  
+#define TOUCH_XPT2046_MOSI 11  
+#define TOUCH_XPT2046_CS 17  
+#define TOUCH_XPT2046_INT 18  
+3. RTC  
+SDA 8  
+SCL 9  
 
+#### 使用到的组件  
 - UI界面： 
 1. LVGL v8.3.11
 2. LVGL界面UI使用SquareLine 1.4.0设计生成
-3. 界面效果如下  
+3. 界面效果如下：  
 
 ![Alt text](./images/screen_1.png)  
 
@@ -31,7 +49,12 @@
 3. bblanchon/ArduinoJson@6.21.5
 4. moononournation/GFX Library for Arduino@^1.4.6 	
 
-#### 更新说明：  
+#### 更新说明  
+2024-5-23
+1. 完成触摸驱动，并且与屏幕共用SPI总线，以便节省针脚。  
+2. 将获取心知天气的方法，由原来timer改为task，并按延时15分钟执行。解决切换到时钟页面时读秒卡2~3秒的问题。  
+3. fix ntp时间的同步。
+
 2024-5-22
 1. 获取心知3天天气数据，并更新当天
 2. 利用心知接口，实现定位。
