@@ -50,6 +50,10 @@ SCL 9
 4. moononournation/GFX Library for Arduino@^1.4.6 	
 
 #### 更新说明  
+2024-5-31  
+1.采用定时器，自动切换当天页面与其他天页面。
+2.细分页面元素更新方法，以便在相对应时机调用更新。
+
 2024-5-30  
 1.将页面元素的显示更新与页面逻辑分离，分别放到ui_disp_update_imp模块和ui_action_imp模块  
 

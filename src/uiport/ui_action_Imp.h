@@ -34,16 +34,19 @@ typedef struct
 
 } global_Time;
 
-extern lv_obj_t * currentScreen;
-void initTimer(void);
+ 
 
-void changewifistatus(uint8_t wl_wifistatus);
+void initRTCTimer(void);
+
+void uiChangeScreen(int nindex, lv_scr_load_anim_t fademode);
+
+void changeWifiStatus(uint8_t wl_wifistatus);
 
 char *intToCharPtr(int value);
-int getNtpTimeL(tm &timeinfo);
+int getNtpTimeL( );
 
 
 void configTimeL(); 
 
-void wificonnected(wl_status_t wl_status);
+void wifiConnected(wl_status_t wl_status);
 #endif //__UI_ACTION_IMP__
