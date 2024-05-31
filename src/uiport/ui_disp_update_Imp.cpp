@@ -29,17 +29,8 @@ void lvUpdateUIElements()
  *   界面显示更新相关
  ************************************************/
 
-void changewifistatus(uint8_t wl_wifistatus)
-{
-  if (wl_wifistatus == WL_CONNECTED)
-  {
-  }
-  else
-  {
-  }
-}
 // 界面上显示信息
-void showMessage(const char *msg)
+void lv_scwelcome_showMessage(const char *msg)
 {
   String lstr = msg;
   _ui_label_set_property(ui_lbMessage, 0, lstr.c_str());
@@ -74,7 +65,7 @@ void lv_sctoday_update_weather(String &city,String &wheather,String &wind,const 
     lv_img_set_src(ui_ImgIcon, &wicon );
 }
 
-void lv_update_RTC_Time(String &sdate, String &hh, String &mm, String &ss)
+void lv_sctoday_update_RTC_Time(String &sdate, String &hh, String &mm, String &ss)
 {
   lv_obj_t *_lbdate = ui_comp_get_child(ui_panelTop2, 4);
   if (_lbdate != NULL)
@@ -100,7 +91,7 @@ void lv_scwelcome_update_tip()
     Serial.print('\n');
 
 }
-void lv_update_wifi_status(int wf_status)
+void lv_all_update_wifi_status(int wf_status)
 {
   
     // 更换wifi状态icon

@@ -37,6 +37,8 @@ typedef struct
 extern lv_obj_t * currentScreen;
 void initTimer(void);
 
+void changewifistatus(uint8_t wl_wifistatus);
+
 char *intToCharPtr(int value);
 int getNtpTimeL(tm &timeinfo);
 

@@ -1,4 +1,4 @@
-# esp32-TFT_eSPI-ILI9431-XPT2046-Touch
+# esp32-ILI9431-XPT2046-Touch
 
 #### 软硬介绍
  **   本程序是ESP32-S3+ILI9431(带xpt2046触摸)屏幕，**
