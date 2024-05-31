@@ -48,7 +48,7 @@ void setup()
 
   // 初始化WIf功能
   myWifiConfig.setApssid("A");
-  ui_wifi_hdl.tip_message = &showMessage;
+  ui_wifi_hdl.tip_message = &lv_scwelcome_showMessage;
   ui_wifi_hdl.ui_handelr = &wificonnected;
   myWifiConfig.ui_handler_register(&ui_wifi_hdl);
 

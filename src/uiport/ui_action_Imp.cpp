@@ -33,20 +33,16 @@ const char *ntpServer = "ntp1.aliyun.com"; // 阿里云NTP网络时间服务器
 const long gmtOffset_sec = 28800;
 const int daylightOffset_sec = 0;
 
-
-
 DS3231 Clock;
 bool Century = false;
 bool h12 = false;
 bool PM;
 
-
-
 SemaphoreHandle_t xMutex; // 互斥锁句柄
 /**********互斥锁句柄用法**************************/
 //    if (xSemaphoreTake(xMutex, portMAX_DELAY))
 //     {
-     
+
 //       xSemaphoreGive(xMutex);
 //     }
 /**********互斥锁句柄用法**************************/
@@ -109,26 +105,25 @@ const char *zWeek[7] = {
  ************************************************/
 void configTimeL()
 {
-configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
+  configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
 }
 
- 
 int getNtpTimeL(global_Time &gl_time)
 {
   time_t now;
   char strftime_buf[64];
   tm timeinfo;
-/*
-  time(&now);
-  // 将时区设置为中国标准时间
-  setenv("TZ", "CST-8", 1);
-  tzset();
+  /*
+    time(&now);
+    // 将时区设置为中国标准时间
+    setenv("TZ", "CST-8", 1);
+    tzset();
 
-  localtime_r(&now, &timeinfo);
-  strftime(strftime_buf, sizeof(strftime_buf), "%c", &timeinfo);
-  ESP_LOGI(TAG, "The current date/time in Shanghai is: %s", strftime_buf);
+    localtime_r(&now, &timeinfo);
+    strftime(strftime_buf, sizeof(strftime_buf), "%c", &timeinfo);
+    ESP_LOGI(TAG, "The current date/time in Shanghai is: %s", strftime_buf);
 
- */
+   */
 
   // tm timeinfo;
   Serial.print("获取网络时间...\n");
@@ -150,14 +145,14 @@ int getNtpTimeL(global_Time &gl_time)
     Serial.print("月：");
     Serial.println(timeinfo.tm_mon);
 
-    int hh = (timeinfo.tm_hour < 12 ? timeinfo.tm_hour : timeinfo.tm_hour + 6);
-
+    int hh = timeinfo.tm_hour;
+    hh = (hh < 12 ? hh : hh + 6);
     Serial.print("更新RTC时钟的时间。\n");
     Serial.printf("更新RTC时间小时为:%d\n", hh);
 
     if (xSemaphoreTake(xMutex, portMAX_DELAY))
     {
-      Clock.setClockMode(h12);
+
       Clock.setSecond(timeinfo.tm_sec);      // Set the second
       Clock.setMinute(timeinfo.tm_min);      // Set the minute
       Clock.setHour(hh);                     // Set the hour
@@ -168,10 +163,7 @@ int getNtpTimeL(global_Time &gl_time)
 
       xSemaphoreGive(xMutex);
     }
-
-
   }
-
 
   Serial.println("获取网络时间结束！");
   return WiFi.status();
@@ -186,7 +178,7 @@ void task_reqWeather_Callback(void *arg)
   {
 
     // 更新时间
-      getNtpTimeL(gl_time); 
+    getNtpTimeL(gl_time);
     myWeather.requestsWeather();
 
     String city = req_Result.locat.city_name;
@@ -220,27 +212,27 @@ void timer_get_RTC_Callback(void *arg)
   byte year, month, date, DoW, hour, minute, second;
   byte temper;
 
-Clock.getTime(year, month, date, DoW, hour, minute, second);
-month = Clock.getMonth(Century);
+  Clock.getTime(year, month, date, DoW, hour, minute, second);
+  month = Clock.getMonth(Century);
 
-temper= Clock.getTemperature();
-/*
-  struct tm *t;
-  time_t tt;
-  time(&tt);
-  t = localtime(&tt);
-  Serial.printf("%4d年%02d月%02d日 %02d:%02d:%02d\n",
-                t->tm_year + 1900, t->tm_mon + 1, t->tm_mday, t->tm_hour, t->tm_min, t->tm_sec);
+  temper = Clock.getTemperature();
+  /*
+    struct tm *t;
+    time_t tt;
+    time(&tt);
+    t = localtime(&tt);
+    Serial.printf("%4d年%02d月%02d日 %02d:%02d:%02d\n",
+                  t->tm_year + 1900, t->tm_mon + 1, t->tm_mday, t->tm_hour, t->tm_min, t->tm_sec);
 
-  year = t->tm_year + 1900;
-  month = t->tm_mon + 1;
-  date = t->tm_mday;
-  DoW = t->tm_wday;
-  hour = t->tm_hour;
-  minute = t->tm_min;
-  second = t->tm_sec;
-*/
-  
+    year = t->tm_year + 1900;
+    month = t->tm_mon + 1;
+    date = t->tm_mday;
+    DoW = t->tm_wday;
+    hour = t->tm_hour;
+    minute = t->tm_min;
+    second = t->tm_sec;
+  */
+
   String hh, mm, ss, sdate, stime;
   hh = intToCharPtr(hour);
   mm = intToCharPtr(minute);
@@ -249,8 +241,7 @@ temper= Clock.getTemperature();
   stime = hh + ":" + mm + ":" + ss;
 
   // 显示时分秒
-  lv_update_RTC_Time(sdate, hh, mm, ss);
-
+  lv_sctoday_update_RTC_Time(sdate, hh, mm, ss);
 
   // ptime->second = second;
   // ptime->minute = minute;
@@ -269,14 +260,15 @@ temper= Clock.getTemperature();
   // ptime->sdate = String(year) + "年" + String(month) + "月" + String(date) + "日  " + ptime->week;
   // ptime->stime = ptime->shour + ":" + ptime->sminute + ":" + ptime->ssecond;
 
- 
   Serial.print(stime);
   Serial.print('\n');
- 
 }
 
 void initTimer(void)
 {
+
+  // 初始化RTC
+  Clock.setClockMode(h12);
   esp_timer_create_args_t timerRTC_arg = {
       .callback = &timer_get_RTC_Callback,
       .arg = &gl_time,
@@ -301,27 +293,37 @@ void wificonnected(wl_status_t wl_status)
     xMutex = xSemaphoreCreateMutex();
 
     // 创建获取天气的任务，
-
     xTaskCreatePinnedToCore(task_reqWeather_Callback, "heartWeather", 20480, NULL, configMAX_PRIORITIES, &handleTaskWeather, 0);
 
     lv_scwelcome_update_tip();
 
-    // 一切就绪, 启动LVGL任务
+    //时间同步
     configTimeL();
-    //esp_wait_sntp_sync();
+    // esp_wait_sntp_sync();
+    // 一切就绪, 启动LVGL任务
     xTaskNotifyGive(handleTaskWeather);
     Serial.print("xTaskNotifyGive handleTaskWeather done!\n");
 
     delay(6000);
-    initTimer(); // start Timer
+    // start Timer
+    initTimer(); 
     delay(2000);
 
     _ui_screen_change(&ui_scToday, LV_SCR_LOAD_ANIM_NONE, 0, 0, NULL);
 
-    lv_update_wifi_status((int)wl_status);
+    lv_all_update_wifi_status((int)wl_status);
   }
 }
 
+void changewifistatus(uint8_t wl_wifistatus)
+{
+  if (wl_wifistatus == WL_CONNECTED)
+  {
+  }
+  else
+  {
+  }
+}
 char *intToCharPtr(int value)
 {
   char *result = new char[20];    // 分配足够的内存来存储整数的字符串形式
