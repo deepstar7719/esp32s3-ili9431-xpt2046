@@ -206,13 +206,14 @@ void task_reqWeather_Callback(void *arg)
 
     for (int nindex = 1; nindex < req_Result.dailys.size(); nindex++)
     {
+
+      heart_Daily daily = req_Result.dailys.at(nindex);
+
+      code_day = daily.code_day;
+      code_night = daily.code_night;
       code_day = (code_day == 99 ? 39 : code_day);
       code_night = (code_night == 99 ? 39 : code_night);
-      heart_Daily daily = req_Result.dailys.at(nindex);
-     lv_scWeather_update_otherday_weather(*lv_wearther_obj[nindex - 1], daily, wl_icon[code_day]);
-
-// lv_scWeather_update_otherday_weather(ui_cmPanelWeather1, daily, wl_icon[code_day]);
-      
+      lv_scWeather_update_otherday_weather(*lv_wearther_obj[nindex - 1], daily, wl_icon[code_day]);
     }
 
     lv_all_update_location(city);
@@ -224,7 +225,6 @@ void task_reqWeather_Callback(void *arg)
 void timer_get_RTC_Callback(void *arg)
 {
   Serial.println("****************RTC_Callback**********");
- 
 
   byte year, month, date, DoW, hour, minute, second;
   byte temper;
@@ -247,7 +247,7 @@ void timer_get_RTC_Callback(void *arg)
   // 显示时分秒
   lv_sctoday_update_RTC_Time(hh, mm, ss);
   lv_all_update_panelTop_Day(sdate);
- 
+
   Serial.println(sdate);
   Serial.println(stime);
 }
