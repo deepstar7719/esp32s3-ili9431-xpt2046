@@ -48,7 +48,7 @@ SemaphoreHandle_t xMutex; // 互斥锁句柄
 /**********互斥锁句柄用法**************************/
 
 #define MAX_SCREEN_NUM 3
-#define SCREEN_ANIM_DELAY 5
+#define SCREEN_ANIM_DELAY 10
 #define WEATHER_OF_OTHER_DAYS 2
 lv_obj_t **lv_anim_screen[MAX_SCREEN_NUM] = {
     &ui_scWelcome,
@@ -56,10 +56,9 @@ lv_obj_t **lv_anim_screen[MAX_SCREEN_NUM] = {
     &ui_scWeather};
 int ncurrentScreen = 0;
 
-lv_obj_t * lv_wearther_obj[WEATHER_OF_OTHER_DAYS]={
-  ui_cmPanelWeather1,
-  ui_cmPanelWeather2
-}
+lv_obj_t **lv_wearther_obj[WEATHER_OF_OTHER_DAYS] = {
+    &ui_cmPanelWeather1,
+    &ui_cmPanelWeather2};
 
 const lv_img_dsc_t *wl_icon[40] = {
     &ui_img_white_wl_0_sm_png,
@@ -157,19 +156,12 @@ int getNtpTimeL()
     Serial.print("月：");
     Serial.println(timeinfo.tm_mon);
 
-    int hh = timeinfo.tm_hour;
-    // hh = (hh < 12 ? hh : hh + 6);
-    // hh = (hh > 23 ? 0 : hh);
-
-    Serial.print("更新RTC时钟的时间。\n");
-    Serial.printf("更新RTC时间小时为:%d\n", hh);
-
     if (xSemaphoreTake(xMutex, portMAX_DELAY))
     {
 
       Clock.setSecond(timeinfo.tm_sec);    // Set the second
       Clock.setMinute(timeinfo.tm_min);    // Set the minute
-      Clock.setHour(hh);                   // Set the hour
+      Clock.setHour(timeinfo.tm_hour);     // Set the hour
       Clock.setDoW(timeinfo.tm_wday);      // Set the day of the week
       Clock.setDate(timeinfo.tm_mday);     // Set the date of the month
       Clock.setMonth(timeinfo.tm_mon + 1); // Set the month of the year
@@ -197,7 +189,6 @@ void task_reqWeather_Callback(void *arg)
 
     String city = req_Result.locat.city_name;
     heart_Daily daily = req_Result.dailys.at(0);
-
     String wheather = daily.getWeather();
     String wind = daily.getWind();
 
@@ -212,8 +203,17 @@ void task_reqWeather_Callback(void *arg)
     Serial.println(wheather);
 
     lv_sctoday_update_weather(wheather, wind, wl_icon[code_day]);
-    lv_scWeather_update_otherday_weather();
 
+    for (int nindex = 1; nindex < req_Result.dailys.size(); nindex++)
+    {
+      code_day = (code_day == 99 ? 39 : code_day);
+      code_night = (code_night == 99 ? 39 : code_night);
+      heart_Daily daily = req_Result.dailys.at(nindex);
+     lv_scWeather_update_otherday_weather(*lv_wearther_obj[nindex - 1], daily, wl_icon[code_day]);
+
+// lv_scWeather_update_otherday_weather(ui_cmPanelWeather1, daily, wl_icon[code_day]);
+      
+    }
 
     lv_all_update_location(city);
     // 延迟15分钟一次
@@ -224,7 +224,7 @@ void task_reqWeather_Callback(void *arg)
 void timer_get_RTC_Callback(void *arg)
 {
   Serial.println("****************RTC_Callback**********");
-  // global_Time *ptime = (global_Time *)arg;
+ 
 
   byte year, month, date, DoW, hour, minute, second;
   byte temper;
@@ -232,25 +232,11 @@ void timer_get_RTC_Callback(void *arg)
   Clock.getTime(year, month, date, DoW, hour, minute, second);
 
   month = Clock.getMonth(Century);
-
   temper = Clock.getTemperature();
-  /*
-    struct tm *t;
-    time_t tt;
-    time(&tt);
-    t = localtime(&tt);
-    Serial.printf("%4d年%02d月%02d日 %02d:%02d:%02d\n",
-                  t->tm_year + 1900, t->tm_mon + 1, t->tm_mday, t->tm_hour, t->tm_min, t->tm_sec);
+  hour = Clock.getHour(h12, PM);
 
-    year = t->tm_year + 1900;
-    month = t->tm_mon + 1;
-    date = t->tm_mday;
-    DoW = t->tm_wday;
-    hour = t->tm_hour;
-    minute = t->tm_min;
-    second = t->tm_sec;
-  */
-
+  Serial.print("RTC:");
+  Serial.println(hour);
   String hh, mm, ss, sdate, stime;
   hh = intToCharPtr(hour);
   mm = intToCharPtr(minute);
@@ -259,24 +245,9 @@ void timer_get_RTC_Callback(void *arg)
   stime = hh + ":" + mm + ":" + ss;
 
   // 显示时分秒
-  lv_sctoday_update_RTC_Time( hh, mm, ss);
-lv_all_update_panelTop_Day(sdate);
-  // ptime->second = second;
-  // ptime->minute = minute;
-  // ptime->hour = hour;
-  // ptime->date = date;
-  // ptime->month = month;
-  // ptime->year = year;
-  // ptime->year = ptime->year + 2000;
-  // ptime->wday = DoW;
-  // ptime->week = zWeek[DoW];
-
-  // ptime->shour = intToCharPtr(ptime->hour);
-  // ptime->sminute = intToCharPtr(ptime->minute);
-  // ptime->ssecond = intToCharPtr(ptime->second);
-
-  // ptime->sdate = String(year) + "年" + String(month) + "月" + String(date) + "日  " + ptime->week;
-  // ptime->stime = ptime->shour + ":" + ptime->sminute + ":" + ptime->ssecond;
+  lv_sctoday_update_RTC_Time(hh, mm, ss);
+  lv_all_update_panelTop_Day(sdate);
+ 
   Serial.println(sdate);
   Serial.println(stime);
 }
