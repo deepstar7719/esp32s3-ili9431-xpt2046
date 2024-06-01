@@ -17,7 +17,7 @@ extern "C" {
 #define UI_COMP_CMPANELWEATHER_IMGICON 1
 #define UI_COMP_CMPANELWEATHER_LBTEMP 2
 #define UI_COMP_CMPANELWEATHER_LBDATE 3
-#define UI_COMP_CMPANELWEATHER_LABEL5 4
+#define UI_COMP_CMPANELWEATHER_LBDESC 4
 #define _UI_COMP_CMPANELWEATHER_NUM 5
 lv_obj_t * ui_cmPanelWeather_create(lv_obj_t * comp_parent);
 
