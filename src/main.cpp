@@ -1,10 +1,11 @@
 #include <Arduino.h>
-#include "ui/ui.h"
-#include "uiport/lv_port_gfx_disp.h"
 #include <Wire.h>
 
+#include "ui/ui.h"
+#include "uiport/lv_disp_gfx_adapt.h"
+#include "uiport/ui_action_Imp.h"
+
 #include "nvs_data_handle.h"
-#include "lv_disp_flush_Imp.h"
 
 #include "espWifiConfig.h"
 #include "heartWeather.h"
@@ -47,8 +48,8 @@ void setup()
 
   // 初始化WIf功能
   myWifiConfig.setApssid("A");
-  ui_wifi_hdl.tip_message = &showMessage;
-  ui_wifi_hdl.ui_handelr = &wificonnected;
+  ui_wifi_hdl.tip_message = &lv_scwelcome_showMessage;
+  ui_wifi_hdl.ui_handelr = &wifiConnected;
   myWifiConfig.ui_handler_register(&ui_wifi_hdl);
 
   // put your setup code here, to run once:

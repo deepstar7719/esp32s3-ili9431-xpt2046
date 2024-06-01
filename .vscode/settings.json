@@ -61,7 +61,10 @@
         "condition_variable": "cpp",
         "ratio": "cpp",
         "mutex": "cpp",
-        "thread": "cpp"
+        "thread": "cpp",
+        "esp32-hal.h": "c",
+        "sntp.h": "c"
     },
-    "idf.adapterTargetName": "esp32s3"
+    "idf.adapterTargetName": "esp32s3",
+    "cmake.ignoreCMakeListsMissing": true
 }
