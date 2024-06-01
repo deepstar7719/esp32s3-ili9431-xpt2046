@@ -41,6 +41,8 @@ SCL 9
 
 ![Alt text](./images/screen_3.png)  
 
+#### 实际效果  
+[电子时钟视频](https://t.bilibili.com/938091913412608036?share_source=pc_native)  
 
 
  - 引用的组件：
