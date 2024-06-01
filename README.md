@@ -51,6 +51,11 @@ SCL 9
 3. bblanchon/ArduinoJson@6.21.5
 4. moononournation/GFX Library for Arduino@^1.4.6 	
 
+#### 注意事项  
+1. 关于心知天所的私钥：
+请在main.c文件第36行，修改成自己的心知天所私钥。
+
+
 #### 更新说明  
 2024-6-1  
 1. 完成天气页面中明天、后天两天的天气显示。
