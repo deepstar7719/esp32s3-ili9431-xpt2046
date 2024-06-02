@@ -1,4 +1,4 @@
-# esp32-TFT_eSPI-ILI9431-XPT2046-Touch
+# esp32-ILI9431-XPT2046-Touch
 
 #### 软硬介绍
  **   本程序是ESP32-S3+ILI9431(带xpt2046触摸)屏幕，**
@@ -41,6 +41,8 @@ SCL 9
 
 ![Alt text](./images/screen_3.png)  
 
+#### 实际效果  
+[电子时钟视频](https://t.bilibili.com/938091913412608036?share_source=pc_native)  
 
 
  - 引用的组件：
@@ -49,7 +51,23 @@ SCL 9
 3. bblanchon/ArduinoJson@6.21.5
 4. moononournation/GFX Library for Arduino@^1.4.6 	
 
+#### 注意事项  
+1. 关于心知天所的私钥：
+请在main.c文件第36行，修改成自己的心知天所私钥。
+heartWeather myWeather("换成自己的私钥");
+
 #### 更新说明  
+2024-6-1  
+1. 完成天气页面中明天、后天两天的天气显示。
+2. 修改时间不准的bug。  
+ 
+2024-5-31  
+1.采用定时器，自动切换当天页面与其他天页面。
+2.细分页面元素更新方法，以便在相对应时机调用更新。
+
+2024-5-30  
+1.将页面元素的显示更新与页面逻辑分离，分别放到ui_disp_update_imp模块和ui_action_imp模块  
+
 2024-5-23
 1. 完成触摸驱动，并且与屏幕共用SPI总线，以便节省针脚。  
 2. 将获取心知天气的方法，由原来timer改为task，并按延时15分钟执行。解决切换到时钟页面时读秒卡2~3秒的问题。  

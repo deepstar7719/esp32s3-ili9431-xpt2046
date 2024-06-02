@@ -24,7 +24,7 @@ void ui_scToday_screen_init(void)
     ui_mm = lv_label_create(ui_scToday);
     lv_obj_set_width(ui_mm, LV_SIZE_CONTENT);   /// 1
     lv_obj_set_height(ui_mm, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_x(ui_mm, -12);
+    lv_obj_set_x(ui_mm, -16);
     lv_obj_set_y(ui_mm, -20);
     lv_obj_set_align(ui_mm, LV_ALIGN_CENTER);
     lv_label_set_text(ui_mm, "21");
@@ -89,5 +89,16 @@ void ui_scToday_screen_init(void)
     lv_obj_set_align(ui_lbdesc, LV_ALIGN_CENTER);
     lv_label_set_text(ui_lbdesc, "西北风 ");
     lv_obj_set_style_text_font(ui_lbdesc, &ui_font_syHeiTi16, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_sssymbol = lv_label_create(ui_scToday);
+    lv_obj_set_width(ui_sssymbol, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_sssymbol, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_sssymbol, 24);
+    lv_obj_set_y(ui_sssymbol, -3);
+    lv_obj_set_align(ui_sssymbol, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_sssymbol, ":");
+    lv_obj_set_style_text_color(ui_sssymbol, lv_color_hex(0x808080), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_sssymbol, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_sssymbol, &ui_font_dincoros64, LV_PART_MAIN | LV_STATE_DEFAULT);
 
 }

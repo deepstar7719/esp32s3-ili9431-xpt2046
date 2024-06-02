@@ -29,6 +29,7 @@ lv_obj_t * ui_panelTop2;
 lv_obj_t * ui_ImgIcon;
 lv_obj_t * ui_lbtemp;
 lv_obj_t * ui_lbdesc;
+lv_obj_t * ui_sssymbol;
 
 
 // SCREEN: ui_scWeather

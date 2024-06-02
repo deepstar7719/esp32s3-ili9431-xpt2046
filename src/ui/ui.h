@@ -35,6 +35,7 @@ extern lv_obj_t * ui_panelTop2;
 extern lv_obj_t * ui_ImgIcon;
 extern lv_obj_t * ui_lbtemp;
 extern lv_obj_t * ui_lbdesc;
+extern lv_obj_t * ui_sssymbol;
 // SCREEN: ui_scWeather
 void ui_scWeather_screen_init(void);
 extern lv_obj_t * ui_scWeather;
