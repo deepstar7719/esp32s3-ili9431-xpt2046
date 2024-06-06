@@ -83,7 +83,7 @@ protected:
     typedef std::function<int(String)> TParseFunction;
 
 public:
-    heartWeather(String reqUserKey);
+    heartWeather();
     virtual ~heartWeather();
     int _icon;
     int _hour;
@@ -103,13 +103,12 @@ public:
 
 private:
     String _today;
-
     String _reqUserKey = ""; // 私钥
     String _reqUnit = "c";   // 摄氏
     String _reqRes = "";
 
 public:
-    void selectIcon(int i);
+    void setUserKey(String reqUserKey);
 
     int requestHoliday();
     int requestsWeather();

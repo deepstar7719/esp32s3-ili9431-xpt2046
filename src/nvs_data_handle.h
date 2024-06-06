@@ -8,12 +8,10 @@ struct global_Parameter
 {
   String wifi_ssid = "";
   String wifi_pass = "";
-  String reqUserKey = "STm9u5f27O-X4vrvO"; // 私钥
+  String reqUserKey = ""; // 私钥请换成自己的Key。
   String city = "12";                      // 城市
   String reqUnit = "c";                    // 摄氏
 };
-
-
 
 
 

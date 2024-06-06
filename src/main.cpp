@@ -10,7 +10,6 @@
 #include "espWifiConfig.h"
 #include "heartWeather.h"
 
-
 #define DIRECT_MODE
 
 /*******************
@@ -31,13 +30,12 @@ request_Result req_Result;
 DNSServer dnsServer;  // 创建dnsServer实例
 WebServer server(80); // 开启web服务, 创建TCP SERVER,参数: 端口号,最大连接数
 espWifiConfig myWifiConfig(&dnsServer, &server);
-heartWeather myWeather("STm9u5f27O-X4vrvO");
+heartWeather myWeather;
 ui_handler_cb ui_wifi_hdl;
 
 /*******************
  *   需前置声明的函数
  ********************/
-
 
 /*******************
  *   setup开始
@@ -45,6 +43,8 @@ ui_handler_cb ui_wifi_hdl;
 void setup()
 {
   Serial.println("begin setup!");
+
+  // global_Para.reqUserKey="";  //第一次使用，请换成自己的心知私钥。之后可删除。
 
   // 初始化WIf功能
   myWifiConfig.setApssid("A");
@@ -66,19 +66,20 @@ void setup()
   lv_port_gfx_Init();
   Serial.print("init gfxdrv done!\n");
 
-  
   ui_init();
   Serial.print("ui_init  done!\n");
   // 一切就绪, 启动LVGL任务
   xTaskNotifyGive(handleTaskLvgl);
   Serial.print("xTaskNotifyGive handleTaskLvgl done!\n");
 
-
   delay(1000);
+  bool isread = readlastdata(&global_Para);
 
-  if (readlastdata(&global_Para))
+  myWeather.setUserKey(global_Para.reqUserKey);
+
+  if (isread && global_Para.wifi_ssid != "")
   {
-    String lstr = "正在尝试连接WIFI" + global_Para.wifi_ssid;
+    String lstr = "正在尝试连接WIFI:" + global_Para.wifi_ssid;
     _ui_label_set_property(ui_lbMessage, 0, lstr.c_str());
 
     Serial.print(lstr.c_str());

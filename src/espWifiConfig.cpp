@@ -216,7 +216,7 @@ void espWifiConfig::connectToWifi()
     Serial.println("用nvs保存的信息连接.");
     WiFi.begin(); // 连接上一次连接成功的wifi
   }
-  // WiFi.begin(_wifi_ssid.c_str(), _wifi_pass.c_str());
+
   int Connect_time = 0; // 用于连接计时，如果长时间连接不成功，复位设备
   while (WiFi.status() != WL_CONNECTED)
   { // 等待WIFI连接成功

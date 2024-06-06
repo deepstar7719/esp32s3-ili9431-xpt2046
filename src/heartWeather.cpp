@@ -3,13 +3,19 @@
 extern request_Result req_Result;
 extern SemaphoreHandle_t xMutex;
 
-heartWeather::heartWeather(String reqUserKey)
+heartWeather::heartWeather()
 {
-  _reqUserKey = reqUserKey;
+   
 }
 
 heartWeather::~heartWeather()
 {
+}
+
+ 
+void heartWeather::setUserKey(String reqUserKey)
+{
+   _reqUserKey=reqUserKey;
 }
 
 // 请求节假日信息（判断今天是否是节假日）
@@ -214,7 +220,4 @@ int heartWeather::parseJsonHoliday(String data)
 {
   return 0;
 }
-// 选择天气图标
-void heartWeather::selectIcon(int i)
-{
-}
+ 

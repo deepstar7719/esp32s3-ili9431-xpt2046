@@ -7,7 +7,7 @@
 #include <ESPmDNS.h>  //用于设备域名 MDNS.begin("esp32")
 #include <esp_wifi.h> //用于esp_wifi_restore() 删除保存的wifi信息
 
-// const char* AP_PASS  = "";               //设置AP热点密码
+
 
 // 定义根目录首页网页HTML源代码
 #define ROOT_HTML "<!DOCTYPE html><html lang=\"zh\"><head><meta charset=\"UTF-8\"><title>WIFI Config by Lotware</title><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"></head>\
@@ -75,7 +75,7 @@ public:
   void restoreWifi();
   void checkConnect(bool reConnect);
   bool scanWifi();
-  void readlastdata();
+   
   void initSoftAP();
   void initDNS();
   void initWebServer();
