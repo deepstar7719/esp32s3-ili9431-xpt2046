@@ -1,13 +1,11 @@
 #include <Arduino.h>
-#include <Wire.h>
 
+#include <Wire.h>
 #include "ui/ui.h"
 #include "uiport/lv_disp_gfx_adapt.h"
 #include "uiport/ui_action_Imp.h"
-
-#include "nvs_data_handle.h"
-
-#include "espWifiConfig.h"
+#include "nvs_data_handle.h" 
+#include "esp_wifi_config.h"
 #include "heartWeather.h"
 
 #define DIRECT_MODE
@@ -29,9 +27,12 @@ request_Result req_Result;
 
 DNSServer dnsServer;  // 创建dnsServer实例
 WebServer server(80); // 开启web服务, 创建TCP SERVER,参数: 端口号,最大连接数
-espWifiConfig myWifiConfig(&dnsServer, &server);
+ 
+
+ 
+
 heartWeather myWeather;
-ui_handler_cb ui_wifi_hdl;
+//ui_handler_cb ui_wifi_hdl;
 
 /*******************
  *   需前置声明的函数
@@ -46,11 +47,11 @@ void setup()
 
   // global_Para.reqUserKey="";  //第一次使用，请换成自己的心知私钥。之后可删除。
 
-  // 初始化WIf功能
-  myWifiConfig.setApssid("A");
-  ui_wifi_hdl.tip_message = &lv_scwelcome_showMessage;
-  ui_wifi_hdl.ui_handelr = &wifiConnected;
-  myWifiConfig.ui_handler_register(&ui_wifi_hdl);
+
+  // myWifiConfig.setApssid("A");  
+  // ui_wifi_hdl.tip_message = &lv_scwelcome_showMessage;
+  // ui_wifi_hdl.ui_handelr = &wifiConnected;
+  // myWifiConfig.ui_handler_register(&ui_wifi_hdl);
 
   // put your setup code here, to run once:
   pinMode(wifi_LED, OUTPUT);        // 配置LED口为输出口
@@ -58,6 +59,10 @@ void setup()
   pinMode(reset_Pin, INPUT_PULLUP); // 按键上拉输入模式(默认高电平输入,按下时下拉接到低电平)
 
   // 启动i2c串口
+
+  // 初始化WIf功能
+
+ 
 
   Wire.begin();
   Wire.setPins(8, 9);
@@ -85,7 +90,7 @@ void setup()
     Serial.print(lstr.c_str());
     Serial.print("\n");
     delay(900);
-    myWifiConfig.connectToWifi();
+     connectToWifi();
   }
   else
   {
@@ -95,7 +100,7 @@ void setup()
 
     Serial.println(lstr.c_str());
     Serial.print("\n");
-    myWifiConfig.wifiConfigured();
+     wifiConfigured();
   }
 }
 
@@ -109,16 +114,16 @@ void loop()
     if (!digitalRead(reset_Pin))
     {
       Serial.print("\n按键已长按5秒,正在清空网络连保存接信息.\n");
-      myWifiConfig.restoreWifi(); // 删除保存的wifi信息
+       restoreWifi(); // 删除保存的wifi信息
       eraserData();
       ESP.restart(); // 重启复位esp32
       Serial.print("已重启设备.\n");
     }
   }
 
-  // dnsServer.processNextRequest();  // 检查客户端DNS请求
-  // server.handleClient();           // 检查客户端(浏览器)http请求
-  // myWifiConfig.checkConnect(true); // 检测网络连接状态，参数true表示如果断开重新连接
+  dnsServer.processNextRequest();  // 检查客户端DNS请求
+  server.handleClient();           // 检查客户端(浏览器)http请求
+   checkConnect(true); // 检测网络连接状态，参数true表示如果断开重新连接
 
   delay(30);
 }

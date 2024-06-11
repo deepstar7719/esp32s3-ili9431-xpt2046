@@ -4,7 +4,7 @@
 #define _LV_DISP_FLUSH_IMP_
 #include <Arduino.h>
 #include "ui/ui.h"
-#include "espWifiConfig.h"
+#include "esp_wifi_config.h"
  #include "heartWeather.h"
 
 
