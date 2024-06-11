@@ -27,7 +27,7 @@ extern request_Result req_Result;
 extern uint8_t wifi_status;
 
 extern heartWeather myWeather;
-extern espWifiConfig myWifiConfig;
+ 
 
 const char *ntpServer = "ntp1.aliyun.com"; // 阿里云NTP网络时间服务器
 const long gmtOffset_sec = 28800;
@@ -299,7 +299,9 @@ void wifiConnected(wl_status_t wl_status)
     wifi_status = wl_status;
     //  保存变量
     String ssid, pass;
-    myWifiConfig.getWifiInfo(ssid, pass);
+    //myWifiConfig.getWifiInfo(ssid, pass);
+
+    //wifiManager
     global_Para.wifi_ssid = ssid;
     global_Para.wifi_pass = pass;
     savemyData(global_Para);
@@ -331,7 +333,7 @@ void wifiConnected(wl_status_t wl_status)
     initScreenAnimTimer();
   }
 }
-
+ 
 void changeWifiStatus(uint8_t wl_wifistatus)
 {
   if (wl_wifistatus == WL_CONNECTED)
